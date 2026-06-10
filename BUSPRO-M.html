@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>三橋四丁目接近モニター</title>
+
+<style>
+
+body{
+    font-family:Yu Gothic;
+    margin:20px;
+}
+
+table{
+    border-collapse:collapse;
+    width:100%;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+
+th{
+    background:#eee;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>バスが来るまでの待ち時間表示サイト</h1>
+
+<div id="status">読込中...</div>
+
+<table>
+
+<thead>
+<tr>
+<th>車両番号</th>
+<th>行先</th>
+<th>現在通過地点</th>
+<th>三橋四丁目到着予想</th>
+<th>遅延</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+
+</table>
+
+<script>
+
+const TARGET_STOP =
+"120101";
+
+async function load(){
+
+    const res =
+        await fetch(
+            "http://localhost:3000/shinto11"
+        );
+
+    const data =
+        await res.json();
+
+    const tbody =
+        document.getElementById("tbody");
+
+    tbody.innerHTML="";
+
+    const tripMap = {};
+
+    data.trips.forEach(t=>{
+
+        if(!t.tripUpdate) return;
+
+        tripMap[
+            t.tripUpdate.trip.tripId
+        ] = t.tripUpdate;
+
+    });
+
+    data.vehicles.forEach(v=>{
+
+        if(!v.vehicle) return;
+      
+        const vehicle =
+            v.vehicle;
+
+        const tripId =
+            vehicle.trip.tripId;
+
+        const trip =
+            tripMap[tripId];
+
+        if(!trip) return;
+
+        const routeId =
+            vehicle.trip.routeId;
+
+        if(routeId !== "401007")
+            return;
+
+        const stopUpdate =
+            trip.stopTimeUpdate.find(
+                s =>
+                s.stopId.startsWith(
+                    TARGET_STOP
+                )
+            );
+
+        if(!stopUpdate)
+            return;
+
+        const arrival =
+            Number(
+                stopUpdate.arrival.time
+            ) * 1000;
+
+        const etaMin =
+            Math.round(
+                (
+                    arrival -
+                    Date.now()
+                )
+                /60000
+            );
+
+        const delay =
+            Math.round(
+                stopUpdate.arrival.delay
+                /60
+            );
+
+        const row =
+            document.createElement("tr");
+
+        row.innerHTML=`
+
+            <td>
+            ${vehicle.vehicle.label}
+            </td>
+
+            <td>
+            ${
+                vehicle.trip.directionId===0
+                ?
+                "大宮駅西口"
+                :
+                "さいたま新都心駅"
+            }
+            </td>
+
+            <td>
+            ${data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中"}
+            </td>
+
+            <td>
+            ${etaMin}分
+            </td>
+
+            <td>
+            ${delay}分
+            </td>
+
+        `;
+
+        tbody.appendChild(row);
+
+    });
+
+    document.getElementById(
+        "status"
+    ).textContent =
+    "更新 " +
+    new Date()
+    .toLocaleTimeString();
+
+}
+
+load();
+
+setInterval(load,30000);
+
+</script>
+
+</body>
+</html>
