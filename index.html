@@ -226,7 +226,7 @@ tbody:empty::after {
 
   <div class="board-container">
     <div class="board-header">
-      <h1>大宮国際中等教育学校周辺バス停 接近表示</h1>
+      <h1>学校周辺のバス情報</h1>
       
       <div class="header-controls">
         <div class="filter-container">
@@ -243,7 +243,7 @@ tbody:empty::after {
 
     <!-- 到着間近専用セクション（大宮駅西口選択時のみ表示） -->
     <div id="section-approaching" class="section-block" style="display: none;">
-      <div class="section-title approaching-title"> まもなく到着するバス（大宮駅西口行き）</div>
+      <div class="section-title approaching-title">まもなく到着するバス（大宮駅西口行き）</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -254,7 +254,7 @@ tbody:empty::after {
 
     <!-- 1. 最先着 -->
     <div id="section-top" class="section-block">
-      <div class="section-title"> 最先着便（全体で早い順）</div>
+      <div class="section-title">最先着便</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -265,7 +265,7 @@ tbody:empty::after {
 
     <!-- 2. バス停 120034 -->
     <div id="section-120034" class="section-block">
-      <div class="section-title"> 大宮国際中等教育学校　近接情報</div>
+      <div class="section-title">大宮国際中等教育学校バス停　近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -276,7 +276,7 @@ tbody:empty::after {
 
     <!-- 3. バス停 120101 -->
     <div id="section-120101" class="section-block">
-      <div class="section-title"> 三橋四丁目　近接情報</div>
+      <div class="section-title">三橋四丁目バス停　近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -291,6 +291,8 @@ tbody:empty::after {
 const ROUTE_CONFIG = {
   "401007": { name: "新都11", cssClass: "shinto11", destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } },
   "406002": { name: "大31", cssClass: "r-406002", destinations: { 0: "大宮駅西口", 1: "指扇駅" } },
+  "402008": { name: "大32", cssClass: "r-d3233", destinations: { 0: "加茂川団地", 1: "大宮駅西口" } },
+  "402009": { name: "大33", cssClass: "r-d3233", destinations: { 0: "大宮駅西口", 1: "大宮南高校" } },
   "410001": { name: "大34", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "ららぽーと富士見" } },
   "403006": { name: "大35", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "所沢駅東口" } },
   "403001": { name: "大36", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "二ツ宮" } },
@@ -345,8 +347,6 @@ function filterAndRender() {
   const section120101 = document.getElementById("section-120101");
 
   if (filterValue === "omiya") {
-    // 「大宮駅西口」フィルター選択時：
-    // 遅延加算後の到着時間が指定分数（3分）以内の便を取得
     const approachingBuses = filteredBuses.filter(b => b.totalEtaMin <= APPROACHING_THRESHOLD_MIN);
 
     if (approachingBuses.length > 0) {
@@ -356,17 +356,14 @@ function filterAndRender() {
       sectionApproaching.style.display = "none";
     }
 
-    // 各テーブルのレンダリング
     document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
     document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
     
-    // 郊外方面バス停（120101）は大宮駅西口行きが来ないため非表示に
     section120101.style.display = "none";
     sectionTop.style.display = "block";
     section120034.style.display = "block";
 
   } else {
-    // 通常表示（すべての行き先、または他のフィルター選択時）
     sectionApproaching.style.display = "none";
     sectionTop.style.display = "block";
     section120034.style.display = "block";
@@ -408,7 +405,6 @@ async function load(){
                 const scheduledEtaMin = Math.round((arrival - Date.now()) / 60000);
                 const delay = Math.round((s.arrival.delay || 0) / 60);
 
-                // 定時到着予定 + 遅延時間 = 実際の到着予測時間
                 const totalEtaMin = scheduledEtaMin + delay;
 
                 if(totalEtaMin >= 0) {
@@ -431,7 +427,6 @@ async function load(){
         });
     });
 
-    // 遅延を加算した後の「実際の到着時間」順に並び替え
     allBuses.sort((a, b) => a.totalEtaMin - b.totalEtaMin);
 
     cachedBusData = allBuses;
