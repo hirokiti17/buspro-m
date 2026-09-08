@@ -210,31 +210,45 @@ tbody:empty::after {
   font-size: 0.85rem;
 }
 
-/* インフォメーションボタン */
+/* 洗練されたインフォメーションボタン */
 .info-btn {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background-color: #28303d;
-  color: #ffffff;
-  border: 2px solid #4a5768;
-  font-size: 1.2rem;
-  font-weight: bold;
+  background: linear-gradient(135deg, #2a323d, #181d26);
+  color: #8fa3b8;
+  border: 1px solid #3b4759;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
+  outline: none;
+}
+
+.info-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  transition: transform 0.2s ease, fill 0.2s ease;
 }
 
 .info-btn:hover {
-  background-color: #3b4759;
-  transform: scale(1.05);
+  color: #00A0E9;
+  border-color: #00A0E9;
+  background: linear-gradient(135deg, #323d4a, #1f2633);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 160, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.info-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* モーダル */
@@ -242,8 +256,8 @@ tbody:empty::after {
   display: none;
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background-color: rgba(10, 13, 18, 0.8);
+  backdrop-filter: blur(6px);
   z-index: 1000;
   align-items: center;
   justify-content: center;
@@ -251,60 +265,86 @@ tbody:empty::after {
 
 .modal-content {
   background-color: #181d26;
-  border: 2px solid #28303d;
-  border-radius: 8px;
+  border: 1px solid #28303d;
+  border-radius: 10px;
   width: 90%;
-  max-width: 500px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  max-width: 520px;
+  padding: 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   position: relative;
-  color: #d1dbe5;
+  color: #c0ccda;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #28303d;
-  padding-bottom: 12px;
-  margin-bottom: 16px;
+  border-bottom: 1px solid #242c38;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #fff;
+  font-size: 1.15rem;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .modal-close {
   background: none;
   border: none;
-  color: #8fa3b8;
+  color: #6c7d93;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  transition: color 0.2s ease;
 }
 
 .modal-close:hover {
-  color: #fff;
+  color: #ffffff;
 }
 
 .modal-body {
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.7;
 }
 
 .modal-body h3 {
-  font-size: 0.95rem;
-  color: #7CC16D;
-  margin-top: 16px;
-  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #00A0E9;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #242c38;
+}
+
+.modal-body h3:first-child {
+  margin-top: 0;
+}
+
+.modal-body p {
+  margin: 6px 0;
 }
 
 .modal-body ul {
-  padding-left: 20px;
+  padding-left: 18px;
   margin: 6px 0;
+}
+
+.modal-body li {
+  margin-bottom: 4px;
+}
+
+.modal-body a {
+  text-decoration: none;
+}
+
+.modal-body a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 600px) {
@@ -313,7 +353,8 @@ tbody:empty::after {
   th, td { padding: 8px; font-size: 0.85rem; }
   td.destination { font-size: 0.95rem; }
   .route-badge { font-size: 0.8rem; padding: 2px 5px; }
-  .info-btn { bottom: 16px; right: 16px; width: 40px; height: 40px; }
+  .info-btn { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+  .info-btn svg { width: 18px; height: 18px; }
 }
 </style>
 </head>
@@ -363,7 +404,7 @@ tbody:empty::after {
 
     <!-- 2. バス停 120034 -->
     <div id="section-120034" class="section-block">
-      <div class="section-title">大宮国際中等教育学校　近接情報</div>
+      <div class="section-title">大宮国際中等教育学校 近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -374,7 +415,7 @@ tbody:empty::after {
 
     <!-- 3. バス停 120101 -->
     <div id="section-120101" class="section-block">
-      <div class="section-title">三橋四丁目　近接情報</div>
+      <div class="section-title">三橋四丁目 近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -385,8 +426,12 @@ tbody:empty::after {
   </div>
 </div>
 
-<!-- インフォメーションボタン -->
-<button class="info-btn" onclick="toggleModal(true)" aria-label="インフォメーション">ℹ️</button>
+<!-- インフォメーションボタン（SVGアイコン） -->
+<button class="info-btn" onclick="toggleModal(true)" aria-label="インフォメーション">
+  <svg viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+  </svg>
+</button>
 
 <!-- モーダルダイアログ -->
 <div id="infoModal" class="modal-overlay" onclick="handleOverlayClick(event)">
@@ -404,17 +449,18 @@ tbody:empty::after {
       <ul>
         <li>本サービスが利用するリアルタイムデータは、公共交通オープンデータセンターにおいて提供されるものです。</li>
         <li>西武バスから提供されたデータを元にしていますが、必ずしも正確・完全なものとは限りません。</li>
-        <li>>本サービスに関するお問い合わせは、西武バスへの直接の問合せは行わず、以下のメールアドレスにお願いします。</li>
+        <li>本サービスについて、西武バス様への直接のお問い合わせはご遠慮ください。</li>
       </ul>
-      <お問い合わせはこちら＞
+
+      <h3>お問い合わせ</h3>
+      <p>不具合報告やご意見等は以下よりお願いいたします。</p>
       <ul>
-        <li>https://github.com/hirokiti17/buspro-m/issues</li>
-        <li>もしくは</li>
-        <li>https://forms.gle/GcQiamJH3czniuY58</li>
+        <li><a href="https://github.com/hirokiti17/buspro-m/issues" target="_blank" rel="noopener" style="color: #00A0E9;">GitHub Issues</a></li>
+        <li><a href="https://forms.gle/GcQiamJH3czniuY58" target="_blank" rel="noopener" style="color: #00A0E9;">Googleフォーム</a></li>
+      </ul>
 
       <h3>制作者</h3>
       <p>水野・明司（hirokiti17）</p>
-
     </div>
   </div>
 </div>
