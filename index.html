@@ -6,23 +6,23 @@
 <title>三橋四丁目接近モニター</title>
 
 <style>
-/* フォント定義 */
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
 
 :root {
-  --bg-color: #0b0f14;
-  --panel-bg: #121820;
-  --text-main: #f0f8ff;
+  --bg-color: #1a1d24;          /* 駅構内の暗がりを意識した背景 */
+  --casing-bg: #111419;        /* 吊り下げ筐体の金属ボディ */
+  --screen-bg: #0a0d12;        /* 画面自体の黒背景 */
+  --border-frame: #2c323d;
   
-  /* 水色系テーマカラー */
-  --led-cyan: #00e5ff;       /* 主な水色LED */
-  --led-cyan-dim: #007799;   /* 控えめな水色 */
-  --led-white: #e6ffff;      /* 行先など用 */
-  --led-green: #00ff88;      /* 定刻・到着 */
-  --led-orange: #ff9900;     /* 遅延強調 */
+  /* バス系統カラー：水色地×白文字 */
+  --route-cyan-bg: #00a3e0;
+  --route-cyan-text: #ffffff;
   
-  --border-color: #1e2936;
-  --accent-blue: #00bfff;
+  /* 表示テキスト色 */
+  --text-main: #ffffff;
+  --text-sub: #a0acba;
+  --led-green: #00e676;
+  --led-orange: #ff9100;
 }
 
 body {
@@ -30,72 +30,91 @@ body {
   background-color: var(--bg-color);
   color: var(--text-main);
   margin: 0;
-  padding: 20px;
+  padding: 40px 20px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* --- 天井吊り下げパイプの再現 --- */
+.hanger-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hanger-pipes {
+  width: 70%;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hanger-pipes::before,
+.hanger-pipes::after {
+  content: "";
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg, #111, #444 50%, #111);
+  border-left: 1px solid #555;
+  border-right: 1px solid #000;
+}
+
+/* --- 吊り下げ筐体本体 --- */
 .board-container {
   width: 100%;
-  max-width: 900px;
-  background: var(--panel-bg);
-  border: 3px solid #1e2d3d;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.03);
+  background: var(--screen-bg);
+  border: 10px solid var(--casing-bg);
+  border-radius: 8px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.8),
+    inset 0 0 0 2px var(--border-frame);
   overflow: hidden;
   position: relative;
 }
 
-/* 上部の水色アクセントライン */
-.board-container::before {
-  content: "";
+/* 実物モニター特有のスキャンライン（走査線） */
+.board-container::after {
+  content: " ";
   display: block;
-  height: 4px;
-  background: linear-gradient(90deg, var(--led-cyan), #006699);
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
-/* ヘッダーエリア */
+/* ヘッダー */
 .board-header {
-  background: linear-gradient(180deg, #18222e 0%, #0e141c 100%);
-  padding: 16px 24px;
+  background: #181d26;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 3px solid #28303d;
 }
 
 h1 {
   margin: 0;
   font-size: 1.3rem;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* 水色の系統バッジ */
-h1::before {
-  content: "LINE";
-  background: var(--led-cyan);
-  color: #05101a;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 800;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  font-weight: 900;
 }
 
 #status {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.9rem;
-  color: var(--led-cyan);
-  background: rgba(0, 229, 255, 0.08);
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 229, 255, 0.2);
-  text-shadow: 0 0 5px rgba(0, 229, 255, 0.4);
+  color: #8fa3b8;
+  background: #0d1117;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #28303d;
 }
 
 /* テーブルスタイル */
@@ -103,113 +122,117 @@ table {
   border-collapse: collapse;
   width: 100%;
   text-align: left;
+  position: relative;
+  z-index: 1;
 }
 
 th {
-  background-color: #090e14;
-  color: #5c738a;
+  background-color: #12161f;
+  color: #78899a;
   font-size: 0.85rem;
   padding: 12px 18px;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 2px solid #242c38;
   letter-spacing: 1px;
 }
 
 td {
-  padding: 18px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px 18px;
+  border-bottom: 1px solid #1c232e;
   font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 700;
+  vertical-align: middle;
 }
 
-tbody tr {
-  transition: background-color 0.2s;
+tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.015);
 }
 
-tbody tr:hover {
-  background-color: rgba(0, 229, 255, 0.03);
-}
-
-/* 車両番号 */
-td:nth-child(1) {
-  font-family: 'Share Tech Mono', monospace;
-  color: var(--led-cyan);
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
-}
-
-/* 行先 */
-td:nth-child(2) {
-  color: var(--led-white);
-  font-size: 1.2rem;
+/* 系統指定タグ（水色地に白文字） */
+.route-badge {
+  display: inline-block;
+  background-color: var(--route-cyan-bg);
+  color: var(--route-cyan-text);
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 1rem;
   letter-spacing: 1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 現在地 */
-td:nth-child(3) {
-  color: #b0d8f0;
+/* 各項目のスタイル */
+td.vehicle-id {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-sub);
 }
 
-/* 到着予想 */
-td:nth-child(4) {
-  color: var(--led-cyan);
+td.destination {
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+td.current-stop {
+  color: #d1dbe5;
+}
+
+td.eta {
+  color: var(--led-green);
   font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
-  font-size: 1.35rem;
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+  font-size: 1.3rem;
 }
 
-/* 遅延 */
-td:nth-child(5) {
+td.delay {
   color: var(--led-orange);
   font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
-  text-shadow: 0 0 6px rgba(ff, 153, 0, 0.4);
 }
 
 /* データなし表示 */
 tbody:empty::after {
-  content: "現在、新都11系統の運行情報はありません";
+  content: "現在運行中のバス情報はありません";
   display: block;
-  padding: 35px;
+  padding: 40px;
   text-align: center;
-  color: #41556b;
-  font-size: 0.95rem;
+  color: #4a5768;
+  font-size: 1rem;
 }
 
 @media (max-width: 600px) {
-  .board-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  th, td {
-    padding: 12px 10px;
-    font-size: 0.95rem;
-  }
-  td:nth-child(2), td:nth-child(4) {
-    font-size: 1.05rem;
-  }
+  body { padding: 10px; }
+  .hanger-pipes { display: none; } /* スマホ等では吊り下げパーツを非表示 */
+  th, td { padding: 10px; font-size: 0.9rem; }
+  td.destination { font-size: 1rem; }
+  .route-badge { font-size: 0.85rem; padding: 2px 6px; }
 }
 </style>
 
 </head>
 <body>
 
-<div class="board-container">
-  <div class="board-header">
-    <h1>三橋四丁目 接近モニター</h1>
-    <div id="status">読込中...</div>
-  </div>
+<div class="hanger-wrapper">
+  <!-- 吊り下げ金具パーツ -->
+  <div class="hanger-pipes"></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>車両番号</th>
-        <th>行先</th>
-        <th>現在地</th>
-        <th>到着予想</th>
-        <th>遅延</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+  <!-- サイネージ本体 -->
+  <div class="board-container">
+    <div class="board-header">
+      <h1>三橋四丁目 バス接近表示</h1>
+      <div id="status">読込中...</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>系統</th>
+          <th>車両</th>
+          <th>行先</th>
+          <th>現在通過地点</th>
+          <th>到着予想</th>
+          <th>遅延</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
@@ -261,6 +284,7 @@ async function load(){
         const routeId =
             vehicle.trip.routeId;
 
+        // 今後ほかの系統を追加する場合は、判定条件を拡張します
         if(routeId !== "401007")
             return;
 
@@ -301,10 +325,14 @@ async function load(){
         row.innerHTML=`
 
             <td>
+              <span class="route-badge">新都11</span>
+            </td>
+
+            <td class="vehicle-id">
             ${vehicle.vehicle.label}
             </td>
 
-            <td>
+            <td class="destination">
             ${
                 vehicle.trip.directionId===0
                 ?
@@ -314,15 +342,15 @@ async function load(){
             }
             </td>
 
-            <td>
+            <td class="current-stop">
             ${data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中"}
             </td>
 
-            <td>
+            <td class="eta">
             ${etaMin}分
             </td>
 
-            <td>
+            <td class="delay">
             ${delay}分
             </td>
 
