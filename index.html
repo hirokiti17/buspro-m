@@ -9,12 +9,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
 
 :root {
-  --bg-color: #1a1d24;          
-  --casing-bg: #111419;        
-  --screen-bg: #0a0d12;       
+  --bg-color: #1a1d24;
+  --casing-bg: #111419;
+  --screen-bg: #0a0d12;
   --border-frame: #2c323d;
-  
-  /* 表示テキスト色 */
   --text-main: #ffffff;
   --text-sub: #a0acba;
   --led-green: #00e676;
@@ -32,7 +30,6 @@ body {
   align-items: center;
 }
 
-/* --- 天井吊り下げパイプの再現 --- */
 .hanger-wrapper {
   position: relative;
   width: 100%;
@@ -59,20 +56,16 @@ body {
   border-right: 1px solid #000;
 }
 
-/* --- 吊り下げ筐体本体 --- */
 .board-container {
   width: 100%;
   background: var(--screen-bg);
   border: 10px solid var(--casing-bg);
   border-radius: 8px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.8),
-    inset 0 0 0 2px var(--border-frame);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 0 2px var(--border-frame);
   overflow: hidden;
   position: relative;
 }
 
-/* 実物モニター特有のスキャンライン（走査線） */
 .board-container::after {
   content: " ";
   display: block;
@@ -85,7 +78,6 @@ body {
   opacity: 0.6;
 }
 
-/* ヘッダー */
 .board-header {
   background: #181d26;
   padding: 14px 24px;
@@ -93,6 +85,8 @@ body {
   justify-content: space-between;
   align-items: center;
   border-bottom: 3px solid #28303d;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 h1 {
@@ -101,6 +95,26 @@ h1 {
   letter-spacing: 1px;
   color: #fff;
   font-weight: 900;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 行き先絞り込みセレクトボックス */
+.filter-container select {
+  background-color: #0d1117;
+  color: #ffffff;
+  border: 1px solid #28303d;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
 }
 
 #status {
@@ -113,7 +127,16 @@ h1 {
   border: 1px solid #28303d;
 }
 
-/* テーブルスタイル */
+.section-title {
+  background-color: #12161f;
+  color: #78899a;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  font-weight: 900;
+  border-bottom: 2px solid #242c38;
+  border-top: 1px solid #242c38;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -123,18 +146,17 @@ table {
 }
 
 th {
-  background-color: #12161f;
+  background-color: #0d1117;
   color: #78899a;
-  font-size: 0.85rem;
-  padding: 12px 18px;
-  border-bottom: 2px solid #242c38;
-  letter-spacing: 1px;
+  font-size: 0.8rem;
+  padding: 8px 18px;
+  border-bottom: 1px solid #242c38;
 }
 
 td {
-  padding: 16px 18px;
+  padding: 12px 18px;
   border-bottom: 1px solid #1c232e;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   vertical-align: middle;
 }
@@ -143,79 +165,44 @@ tbody tr:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.015);
 }
 
-/* 系統指定タグ */
 .route-badge {
   display: inline-block;
   font-weight: 900;
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   letter-spacing: 1px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 系統別カラーの設定 */
-.route-badge.shinto11 {
-  background-color: #00a3e0; /* 水色 */
-  color: #ffffff;
-}
-
-.route-badge.r-406002 {
-  background-color: #ff9100; /* オレンジ */
-  color: #ffffff;
-}
-
+.route-badge.shinto11 { background-color: #00a3e0; color: #ffffff; }
+.route-badge.r-406002 { background-color: #ff9100; color: #ffffff; }
 .route-badge.r-403001,
-.route-badge.r-403005 {
-  background-color: #76ff03; /* 黄緑 */
-  color: #000000;            /* 視認性向上のため黄緑背景は黒文字 */
-}
+.route-badge.r-403005 { background-color: #76ff03; color: #000000; }
 
-/* 各項目のスタイル */
-td.vehicle-id {
-  font-family: 'Share Tech Mono', monospace;
-  color: var(--text-sub);
-}
+td.vehicle-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); }
+td.destination { font-size: 1.1rem; color: #ffffff; }
+td.current-stop { color: #d1dbe5; }
+td.eta { color: var(--led-green); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-size: 1.2rem; }
+td.delay { color: var(--led-orange); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; }
 
-td.destination {
-  font-size: 1.25rem;
-  color: #ffffff;
-}
-
-td.current-stop {
-  color: #d1dbe5;
-}
-
-td.eta {
-  color: var(--led-green);
-  font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
-  font-size: 1.3rem;
-}
-
-td.delay {
-  color: var(--led-orange);
-  font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
-}
-
-/* データなし表示 */
 tbody:empty::after {
-  content: "現在運行中のバス情報はありません";
+  content: "該当するバスはありません";
   display: block;
-  padding: 40px;
+  padding: 15px;
   text-align: center;
   color: #4a5768;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 600px) {
   body { padding: 10px; }
   .hanger-pipes { display: none; }
-  th, td { padding: 10px; font-size: 0.9rem; }
-  td.destination { font-size: 1rem; }
-  .route-badge { font-size: 0.85rem; padding: 2px 6px; }
+  th, td { padding: 8px; font-size: 0.85rem; }
+  td.destination { font-size: 0.95rem; }
+  .route-badge { font-size: 0.8rem; padding: 2px 5px; }
 }
 </style>
-
 </head>
 <body>
 
@@ -224,172 +211,166 @@ tbody:empty::after {
 
   <div class="board-container">
     <div class="board-header">
-      <h1>大宮国際中等教育学校周辺バス停 バス接近表示</h1>
-      <div id="status">読込中...</div>
+      <h1>大宮国際中等教育学校周辺バス停 接近表示</h1>
+      
+      <div class="header-controls">
+        <!-- 行き先絞り込みメニュー -->
+        <div class="filter-container">
+          <select id="destFilter" onchange="filterAndRender()">
+            <option value="all">すべての行き先</option>
+            <option value="omiya">大宮駅西口</option>
+            <option value="shintoshin">さいたま新都心駅</option>
+            <option value="other">それ以外（郊外・駅方面）</option>
+          </select>
+        </div>
+        <div id="status">読込中...</div>
+      </div>
     </div>
 
+    <!-- 1. 最先着 -->
+    <div class="section-title">⚡ 最先着便（全体で早い順）</div>
     <table>
       <thead>
-        <tr>
-          <th>系統</th>
-          <th>車両</th>
-          <th>行先</th>
-          <th>現在通過地点</th>
-          <th>到着予想</th>
-          <th>遅延</th>
-        </tr>
+        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
       </thead>
-      <tbody id="tbody"></tbody>
+      <tbody id="tbody-top"></tbody>
+    </table>
+
+    <!-- 2. バス停 ID: 120034 -->
+    <div class="section-title">🚏 バス停 (ID: 120034) 近接情報</div>
+    <table>
+      <thead>
+        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
+      </thead>
+      <tbody id="tbody-120034"></tbody>
+    </table>
+
+    <!-- 3. バス停 ID: 120101 -->
+    <div class="section-title">🚏 バス停 (ID: 120101) 近接情報</div>
+    <table>
+      <thead>
+        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
+      </thead>
+      <tbody id="tbody-120101"></tbody>
     </table>
   </div>
 </div>
 
 <script>
-
-// 取得対象のバス停IDリスト（120101 と 120034）
-const TARGET_STOPS = ["120101", "120034"];
-
-// 系統ごとの定義（表示名・CSS・方向ごとの目的地）
 const ROUTE_CONFIG = {
-  "401007": { 
-    name: "新都11", 
-    cssClass: "shinto11",
-    destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" }
-  },
-  "406002": { 
-    name: "大31", 
-    cssClass: "r-406002",
-    destinations: { 0: "大宮駅西口", 1: "指扇駅" }
-  },
-  "403001": { 
-    name: "大36", 
-    cssClass: "r-403001",
-    destinations: { 0: "大宮駅西口", 1: "二ツ宮" }
-  },
-  "403005": { 
-    name: "大37", 
-    cssClass: "r-403005",
-    destinations: { 0: "大宮駅西口", 1: "馬宮団地" }
-  }
+  "401007": { name: "新都11", cssClass: "shinto11", destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } },
+  "406002": { name: "大31", cssClass: "r-406002", destinations: { 0: "大宮駅西口", 1: "指扇駅" } },
+  "403001": { name: "大36", cssClass: "r-403001", destinations: { 0: "大宮駅西口", 1: "二ツ宮" } },
+  "403005": { name: "大37", cssClass: "r-403005", destinations: { 0: "大宮駅西口", 1: "馬宮団地" } }
 };
 
+// 取得データを一時保持するグローバル変数
+let cachedBusData = [];
+
+function createRowHtml(bus, showStopName = false) {
+  const config = ROUTE_CONFIG[bus.routeId];
+  return `
+    <tr>
+      <td><span class="route-badge ${config.cssClass}">${config.name}</span></td>
+      <td class="vehicle-id">${bus.vehicleLabel}</td>
+      <td class="destination">${bus.destination}</td>
+      <td class="current-stop">${bus.currentStop}</td>
+      ${showStopName ? `<td style="color:#8fa3b8; font-size:0.85rem;">${bus.targetStopId}</td>` : ''}
+      <td class="eta">${bus.etaMin}分</td>
+      <td class="delay">${bus.delay}分</td>
+    </tr>
+  `;
+}
+
+// 選択された条件に基づいて絞り込んで描画する関数
+function filterAndRender() {
+  const filterValue = document.getElementById("destFilter").value;
+
+  const filteredBuses = cachedBusData.filter(bus => {
+    if (filterValue === "omiya") {
+      return bus.destination === "大宮駅西口";
+    } else if (filterValue === "shintoshin") {
+      return bus.destination === "さいたま新都心駅";
+    } else if (filterValue === "other") {
+      return bus.destination !== "大宮駅西口" && bus.destination !== "さいたま新都心駅";
+    }
+    return true; // "all"
+  });
+
+  // 1. 最先着
+  const topBuses = filteredBuses.slice(0, 3);
+  document.getElementById("tbody-top").innerHTML = topBuses.map(b => createRowHtml(b, true)).join("");
+
+  // 2. バス停 120034
+  const buses120034 = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3);
+  document.getElementById("tbody-120034").innerHTML = buses120034.map(b => createRowHtml(b, false)).join("");
+
+  // 3. バス停 120101
+  const buses120101 = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3);
+  document.getElementById("tbody-120101").innerHTML = buses120101.map(b => createRowHtml(b, false)).join("");
+}
+
 async function load(){
-
-    const res =
-        await fetch(
-            "https://buspro-worker.mingsihongwu809.workers.dev/shinto11"
-        );
-
-    const data =
-        await res.json();
-
-    const tbody =
-        document.getElementById("tbody");
-
-    tbody.innerHTML = "";
+    const res = await fetch("https://buspro-worker.mingsihongwu809.workers.dev/shinto11");
+    const data = await res.json();
 
     const tripMap = {};
-
     data.trips.forEach(t => {
-        if(!t.tripUpdate) return;
-        tripMap[t.tripUpdate.trip.tripId] = t.tripUpdate;
+        if(t.tripUpdate) tripMap[t.tripUpdate.trip.tripId] = t.tripUpdate;
     });
 
-    const busList = [];
+    const allBuses = [];
 
     data.vehicles.forEach(v => {
-
         if(!v.vehicle) return;
-        
         const vehicle = v.vehicle;
-        const tripId = vehicle.trip.tripId;
-        const trip = tripMap[tripId];
-
+        const trip = tripMap[vehicle.trip.tripId];
         if(!trip) return;
 
         const routeId = vehicle.trip.routeId;
-
-        // 対象の系統に含まれているかチェック
         if(!ROUTE_CONFIG[routeId]) return;
 
-        // 対象のバス停にマッチするか判定
-        const stopUpdate = trip.stopTimeUpdate.find(
-            s => TARGET_STOPS.some(target => s.stopId.startsWith(target))
-        );
+        trip.stopTimeUpdate.forEach(s => {
+            let matchedStopId = null;
+            if(s.stopId.startsWith("120034")) matchedStopId = "120034";
+            if(s.stopId.startsWith("120101")) matchedStopId = "120101";
 
-        if(!stopUpdate) return;
+            if(matchedStopId) {
+                const arrival = Number(s.arrival.time) * 1000;
+                const etaMin = Math.round((arrival - Date.now()) / 60000);
+                const delay = Math.round(s.arrival.delay / 60);
 
-        const arrival = Number(stopUpdate.arrival.time) * 1000;
-        const etaMin = Math.round((arrival - Date.now()) / 60000);
-        const delay = Math.round(stopUpdate.arrival.delay / 60);
+                if(etaMin >= 0) {
+                    const config = ROUTE_CONFIG[routeId];
+                    const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
+                        ? config.destinations[vehicle.trip.directionId]
+                        : "行き先不明";
 
-        if(etaMin >= 0) {
-            const config = ROUTE_CONFIG[routeId];
-            
-            // directionId に対応する行先を取得（定義がない場合のフォールバックを設定）
-            const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
-                ? config.destinations[vehicle.trip.directionId]
-                : "行き先不明";
-
-            busList.push({
-                routeId: routeId,
-                vehicleLabel: vehicle.vehicle.label,
-                destination: destName,
-                currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
-                etaMin: etaMin,
-                delay: delay
-            });
-        }
+                    allBuses.push({
+                        targetStopId: matchedStopId,
+                        routeId: routeId,
+                        vehicleLabel: vehicle.vehicle.label,
+                        destination: destName,
+                        currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
+                        etaMin: etaMin,
+                        delay: delay
+                    });
+                }
+            }
+        });
     });
 
-    // 到着予定が早い順（昇順）にソート
-    busList.sort((a, b) => a.etaMin - b.etaMin);
+    allBuses.sort((a, b) => a.etaMin - b.etaMin);
 
-    // 早い順から上位3件を抽出
-    const top3Buses = busList.slice(0, 3);
+    // グローバル変数にデータをキャッシュして描画関数を呼ぶ
+    cachedBusData = allBuses;
+    filterAndRender();
 
-    // 画面にレンダリング
-    top3Buses.forEach(bus => {
-        const config = ROUTE_CONFIG[bus.routeId];
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>
-              <span class="route-badge ${config.cssClass}">${config.name}</span>
-            </td>
-
-            <td class="vehicle-id">
-            ${bus.vehicleLabel}
-            </td>
-
-            <td class="destination">
-            ${bus.destination}
-            </td>
-
-            <td class="current-stop">
-            ${bus.currentStop}
-            </td>
-
-            <td class="eta">
-            ${bus.etaMin}分
-            </td>
-
-            <td class="delay">
-            ${bus.delay}分
-            </td>
-        `;
-
-        tbody.appendChild(row);
-    });
-
-    document.getElementById("status").textContent =
-        "更新 " + new Date().toLocaleTimeString();
+    document.getElementById("status").textContent = "更新 " + new Date().toLocaleTimeString();
 }
 
 load();
-
 setInterval(load, 30000);
-
 </script>
 
 </body>
