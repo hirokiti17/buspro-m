@@ -3,20 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>三橋四丁目接近モニター</title>
+<title>お帰りのバスのご案内</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
 
 :root {
-  --bg-color: #1a1d24;          /* 駅構内の暗がりを意識した背景 */
-  --casing-bg: #111419;        /* 吊り下げ筐体の金属ボディ */
-  --screen-bg: #0a0d12;        /* 画面自体の黒背景 */
+  --bg-color: #1a1d24;          
+  --casing-bg: #111419;        
+  --screen-bg: #0a0d12;       
   --border-frame: #2c323d;
-  
-  /* バス系統カラー：水色地×白文字 */
-  --route-cyan-bg: #00a3e0;
-  --route-cyan-text: #ffffff;
   
   /* 表示テキスト色 */
   --text-main: #ffffff;
@@ -147,17 +143,32 @@ tbody tr:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.015);
 }
 
-/* 系統指定タグ（水色地に白文字） */
+/* 系統指定タグ */
 .route-badge {
   display: inline-block;
-  background-color: var(--route-cyan-bg);
-  color: var(--route-cyan-text);
   font-weight: 900;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 1rem;
   letter-spacing: 1px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 系統別カラーの設定 */
+.route-badge.shinto11 {
+  background-color: #00a3e0; /* 水色 */
+  color: #ffffff;
+}
+
+.route-badge.r-406002 {
+  background-color: #ff9100; /* オレンジ */
+  color: #ffffff;
+}
+
+.route-badge.r-403001,
+.route-badge.r-403005 {
+  background-color: #76ff03; /* 黄緑 */
+  color: #000000;            /* 視認性向上のため黄緑背景は黒文字 */
 }
 
 /* 各項目のスタイル */
@@ -198,7 +209,7 @@ tbody:empty::after {
 
 @media (max-width: 600px) {
   body { padding: 10px; }
-  .hanger-pipes { display: none; } /* スマホ等では吊り下げパーツを非表示 */
+  .hanger-pipes { display: none; }
   th, td { padding: 10px; font-size: 0.9rem; }
   td.destination { font-size: 1rem; }
   .route-badge { font-size: 0.85rem; padding: 2px 6px; }
@@ -209,10 +220,8 @@ tbody:empty::after {
 <body>
 
 <div class="hanger-wrapper">
-  <!-- 吊り下げ金具パーツ -->
   <div class="hanger-pipes"></div>
 
-  <!-- サイネージ本体 -->
   <div class="board-container">
     <div class="board-header">
       <h1>大宮国際中等教育学校周辺バス停 バス接近表示</h1>
@@ -237,7 +246,32 @@ tbody:empty::after {
 
 <script>
 
-const TARGET_STOP = "120101";
+// 取得対象のバス停IDリスト（120101 と 120034）
+const TARGET_STOPS = ["120101", "120034"];
+
+// 系統ごとの定義（表示名・CSS・方向ごとの目的地）
+const ROUTE_CONFIG = {
+  "401007": { 
+    name: "新都11", 
+    cssClass: "shinto11",
+    destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" }
+  },
+  "406002": { 
+    name: "大31", 
+    cssClass: "r-406002",
+    destinations: { 0: "大宮駅西口", 1: "指扇駅" }
+  },
+  "403001": { 
+    name: "大36", 
+    cssClass: "r-403001",
+    destinations: { 0: "大宮駅西口", 1: "二ツ宮" }
+  },
+  "403005": { 
+    name: "大37", 
+    cssClass: "r-403005",
+    destinations: { 0: "大宮駅西口", 1: "馬宮団地" }
+  }
+};
 
 async function load(){
 
@@ -252,126 +286,109 @@ async function load(){
     const tbody =
         document.getElementById("tbody");
 
-    tbody.innerHTML="";
+    tbody.innerHTML = "";
 
     const tripMap = {};
 
-    data.trips.forEach(t=>{
-
+    data.trips.forEach(t => {
         if(!t.tripUpdate) return;
-
-        tripMap[
-            t.tripUpdate.trip.tripId
-        ] = t.tripUpdate;
-
+        tripMap[t.tripUpdate.trip.tripId] = t.tripUpdate;
     });
 
-    data.vehicles.forEach(v=>{
+    const busList = [];
+
+    data.vehicles.forEach(v => {
 
         if(!v.vehicle) return;
         
-        const vehicle =
-            v.vehicle;
-
-        const tripId =
-            vehicle.trip.tripId;
-
-        const trip =
-            tripMap[tripId];
+        const vehicle = v.vehicle;
+        const tripId = vehicle.trip.tripId;
+        const trip = tripMap[tripId];
 
         if(!trip) return;
 
-        const routeId =
-            vehicle.trip.routeId;
+        const routeId = vehicle.trip.routeId;
 
-        // 今後ほかの系統を追加する場合は、判定条件を拡張します
-        if(routeId !== "401007")
-            return;
+        // 対象の系統に含まれているかチェック
+        if(!ROUTE_CONFIG[routeId]) return;
 
-        const stopUpdate =
-            trip.stopTimeUpdate.find(
-                s =>
-                s.stopId.startsWith(
-                    TARGET_STOP
-                )
-            );
+        // 対象のバス停にマッチするか判定
+        const stopUpdate = trip.stopTimeUpdate.find(
+            s => TARGET_STOPS.some(target => s.stopId.startsWith(target))
+        );
 
-        if(!stopUpdate)
-            return;
+        if(!stopUpdate) return;
 
-        const arrival =
-            Number(
-                stopUpdate.arrival.time
-            ) * 1000;
+        const arrival = Number(stopUpdate.arrival.time) * 1000;
+        const etaMin = Math.round((arrival - Date.now()) / 60000);
+        const delay = Math.round(stopUpdate.arrival.delay / 60);
 
-        const etaMin =
-            Math.round(
-                (
-                    arrival -
-                    Date.now()
-                )
-                /60000
-            );
+        if(etaMin >= 0) {
+            const config = ROUTE_CONFIG[routeId];
+            
+            // directionId に対応する行先を取得（定義がない場合のフォールバックを設定）
+            const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
+                ? config.destinations[vehicle.trip.directionId]
+                : "行き先不明";
 
-        const delay =
-            Math.round(
-                stopUpdate.arrival.delay
-                /60
-            );
+            busList.push({
+                routeId: routeId,
+                vehicleLabel: vehicle.vehicle.label,
+                destination: destName,
+                currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
+                etaMin: etaMin,
+                delay: delay
+            });
+        }
+    });
 
-        const row =
-            document.createElement("tr");
+    // 到着予定が早い順（昇順）にソート
+    busList.sort((a, b) => a.etaMin - b.etaMin);
 
-        row.innerHTML=`
+    // 早い順から上位3件を抽出
+    const top3Buses = busList.slice(0, 3);
 
+    // 画面にレンダリング
+    top3Buses.forEach(bus => {
+        const config = ROUTE_CONFIG[bus.routeId];
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
             <td>
-              <span class="route-badge">新都11</span>
+              <span class="route-badge ${config.cssClass}">${config.name}</span>
             </td>
 
             <td class="vehicle-id">
-            ${vehicle.vehicle.label}
+            ${bus.vehicleLabel}
             </td>
 
             <td class="destination">
-            ${
-                vehicle.trip.directionId===0
-                ?
-                "大宮駅西口"
-                :
-                "さいたま新都心駅"
-            }
+            ${bus.destination}
             </td>
 
             <td class="current-stop">
-            ${data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中"}
+            ${bus.currentStop}
             </td>
 
             <td class="eta">
-            ${etaMin}分
+            ${bus.etaMin}分
             </td>
 
             <td class="delay">
-            ${delay}分
+            ${bus.delay}分
             </td>
-
         `;
 
         tbody.appendChild(row);
-
     });
 
-    document.getElementById(
-        "status"
-    ).textContent =
-    "更新 " +
-    new Date()
-    .toLocaleTimeString();
-
+    document.getElementById("status").textContent =
+        "更新 " + new Date().toLocaleTimeString();
 }
 
 load();
 
-setInterval(load,30000);
+setInterval(load, 30000);
 
 </script>
 
