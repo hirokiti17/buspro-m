@@ -257,56 +257,36 @@ tbody:empty::after {
 </div>
 
 <script>
-// 系統設定マップ（系統名・バッジ用CSSクラス・行先定義）
 const ROUTE_CONFIG = {
-  "401007": { 
-    name: "新都11", 
-    cssClass: "shinto11", 
-    destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } 
-  },
-  "406002": { 
-    name: "大31", 
-    cssClass: "r-406002", 
-    destinations: { 0: "大宮駅西口", 1: "指扇駅" } 
-  },
-  "410001": { 
-    name: "大34", 
-    cssClass: "r-green-std", 
-    destinations: { 0: "大宮駅西口", 1: "ららぽーと富士見" } 
-  },
-  "403006": { 
-    name: "大35", 
-    cssClass: "r-green-std", 
-    destinations: { 0: "大宮駅西口", 1: "所沢駅東口" } 
-  },
-  "403001": { 
-    name: "大36", 
-    cssClass: "r-green-std", 
-    destinations: { 0: "大宮駅西口", 1: "二ツ宮" } 
-  },
-  "403003": { 
-    name: "大36-1", 
-    cssClass: "r-403003", 
-    destinations: { 0: "大宮駅西口", 1: "二ツ宮" } 
-  },
-  "403005": { 
-    name: "大37", 
-    cssClass: "r-green-std", 
-    destinations: { 0: "大宮駅西口", 1: "馬宮団地" } 
-  }
+  "401007": { name: "新都11", cssClass: "shinto11", destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } },
+  "406002": { name: "大31", cssClass: "r-406002", destinations: { 0: "大宮駅西口", 1: "指扇駅" } },
+  "410001": { name: "大34", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "ららぽーと富士見" } },
+  "403006": { name: "大35", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "所沢駅東口" } },
+  "403001": { name: "大36", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "二ツ宮" } },
+  "403003": { name: "大36-1", cssClass: "r-403003", destinations: { 0: "大宮駅西口", 1: "二ツ宮" } },
+  "403005": { name: "大37", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "馬宮団地" } }
+};
+
+// バス停IDに対する画面表示名
+const STOP_NAME_MAP = {
+  "120034": "大宮国際中等教育学校",
+  "120101": "三橋四丁目"
 };
 
 let cachedBusData = [];
 
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
+  // マップから表示名を取得（なければIDをフォールバック表示）
+  const stopDisplayName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
+
   return `
     <tr>
       <td><span class="route-badge ${config.cssClass}">${config.name}</span></td>
       <td class="vehicle-id">${bus.vehicleLabel}</td>
       <td class="destination">${bus.destination}</td>
       <td class="current-stop">${bus.currentStop}</td>
-      ${showStopName ? `<td style="color:#8fa3b8; font-size:0.85rem;">${bus.targetStopId}</td>` : ''}
+      ${showStopName ? `<td style="color:#8fa3b8; font-size:0.85rem;">${stopDisplayName}</td>` : ''}
       <td class="eta">${bus.etaMin}分</td>
       <td class="delay">${bus.delay}分</td>
     </tr>
