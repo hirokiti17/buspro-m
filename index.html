@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>三橋四丁目接近モニター</title>
+<title>お帰りのバスのご案内</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
@@ -332,7 +332,7 @@ tbody:empty::after {
             <option value="all">すべての行き先</option>
             <option value="omiya">大宮駅西口</option>
             <option value="shintoshin">さいたま新都心駅</option>
-            <option value="other">それ以外（郊外・駅方面）</option>
+            <option value="other">その他</option>
           </select>
         </div>
         <div id="status">読込中...</div>
@@ -341,7 +341,7 @@ tbody:empty::after {
 
     <!-- 到着間近専用セクション（大宮駅西口選択時のみ表示） -->
     <div id="section-approaching" class="section-block" style="display: none;">
-      <div class="section-title approaching-title">🚨 まもなく到着するバス（大宮駅西口行き）</div>
+      <div class="section-title approaching-title">まもなく到着するバス（大宮駅西口行き）</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -352,7 +352,7 @@ tbody:empty::after {
 
     <!-- 1. 最先着 -->
     <div id="section-top" class="section-block">
-      <div class="section-title">⚡ 最先着便（全体で早い順）</div>
+      <div class="section-title">最先着便</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -363,7 +363,7 @@ tbody:empty::after {
 
     <!-- 2. バス停 120034 -->
     <div id="section-120034" class="section-block">
-      <div class="section-title">🚏 三橋四丁目（大宮方面）近接情報</div>
+      <div class="section-title">大宮国際中等教育学校　近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -374,7 +374,7 @@ tbody:empty::after {
 
     <!-- 3. バス停 120101 -->
     <div id="section-120101" class="section-block">
-      <div class="section-title">🚏 三橋四丁目（郊外方面）近接情報</div>
+      <div class="section-title">三橋四丁目　近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
