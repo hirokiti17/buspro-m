@@ -2,58 +2,219 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>三橋四丁目接近モニター</title>
 
 <style>
+/* フォント定義 */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700&display=swap');
 
-body{
-    font-family:Yu Gothic;
-    margin:20px;
+:root {
+  --bg-color: #0b0f14;
+  --panel-bg: #121820;
+  --text-main: #f0f8ff;
+  
+  /* 水色系テーマカラー */
+  --led-cyan: #00e5ff;       /* 主な水色LED */
+  --led-cyan-dim: #007799;   /* 控えめな水色 */
+  --led-white: #e6ffff;      /* 行先など用 */
+  --led-green: #00ff88;      /* 定刻・到着 */
+  --led-orange: #ff9900;     /* 遅延強調 */
+  
+  --border-color: #1e2936;
+  --accent-blue: #00bfff;
 }
 
-table{
-    border-collapse:collapse;
-    width:100%;
+body {
+  font-family: 'Zen Kaku Gothic New', "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
 }
 
-th,td{
-    border:1px solid #ccc;
-    padding:8px;
+.board-container {
+  width: 100%;
+  max-width: 900px;
+  background: var(--panel-bg);
+  border: 3px solid #1e2d3d;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.03);
+  overflow: hidden;
+  position: relative;
 }
 
-th{
-    background:#eee;
+/* 上部の水色アクセントライン */
+.board-container::before {
+  content: "";
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--led-cyan), #006699);
 }
 
+/* ヘッダーエリア */
+.board-header {
+  background: linear-gradient(180deg, #18222e 0%, #0e141c 100%);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border-color);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 水色の系統バッジ */
+h1::before {
+  content: "LINE";
+  background: var(--led-cyan);
+  color: #05101a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+#status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--led-cyan);
+  background: rgba(0, 229, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  text-shadow: 0 0 5px rgba(0, 229, 255, 0.4);
+}
+
+/* テーブルスタイル */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+}
+
+th {
+  background-color: #090e14;
+  color: #5c738a;
+  font-size: 0.85rem;
+  padding: 12px 18px;
+  border-bottom: 2px solid var(--border-color);
+  letter-spacing: 1px;
+}
+
+td {
+  padding: 18px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+tbody tr {
+  transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+  background-color: rgba(0, 229, 255, 0.03);
+}
+
+/* 車両番号 */
+td:nth-child(1) {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--led-cyan);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+}
+
+/* 行先 */
+td:nth-child(2) {
+  color: var(--led-white);
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+/* 現在地 */
+td:nth-child(3) {
+  color: #b0d8f0;
+}
+
+/* 到着予想 */
+td:nth-child(4) {
+  color: var(--led-cyan);
+  font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
+  font-size: 1.35rem;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+}
+
+/* 遅延 */
+td:nth-child(5) {
+  color: var(--led-orange);
+  font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif;
+  text-shadow: 0 0 6px rgba(ff, 153, 0, 0.4);
+}
+
+/* データなし表示 */
+tbody:empty::after {
+  content: "現在、水色系統の運行情報はありません";
+  display: block;
+  padding: 35px;
+  text-align: center;
+  color: #41556b;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+  .board-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  th, td {
+    padding: 12px 10px;
+    font-size: 0.95rem;
+  }
+  td:nth-child(2), td:nth-child(4) {
+    font-size: 1.05rem;
+  }
+}
 </style>
 
 </head>
 <body>
 
-<h1>バスが来るまでの待ち時間表示サイト</h1>
+<div class="board-container">
+  <div class="board-header">
+    <h1>三橋四丁目 接近モニター</h1>
+    <div id="status">読込中...</div>
+  </div>
 
-<div id="status">読込中...</div>
-
-<table>
-
-<thead>
-<tr>
-<th>車両番号</th>
-<th>行先</th>
-<th>現在通過地点</th>
-<th>三橋四丁目到着予想</th>
-<th>遅延</th>
-</tr>
-</thead>
-
-<tbody id="tbody"></tbody>
-
-</table>
+  <table>
+    <thead>
+      <tr>
+        <th>車両番号</th>
+        <th>行先</th>
+        <th>現在地</th>
+        <th>到着予想</th>
+        <th>遅延</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
 
 <script>
 
-const TARGET_STOP =
-"120101";
+const TARGET_STOP = "120101";
 
 async function load(){
 
@@ -85,7 +246,7 @@ async function load(){
     data.vehicles.forEach(v=>{
 
         if(!v.vehicle) return;
-      
+        
         const vehicle =
             v.vehicle;
 
