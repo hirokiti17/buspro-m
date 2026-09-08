@@ -6,7 +6,7 @@
 <title>お帰りのバスのご案内</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku Gothic New:wght@700;900&display=swap');
 
 :root {
   --bg-color: #1a1d24;
@@ -103,7 +103,6 @@ h1 {
   gap: 12px;
 }
 
-/* 行き先絞り込みセレクトボックス */
 .filter-container select {
   background-color: #0d1117;
   color: #ffffff;
@@ -175,10 +174,12 @@ tbody tr:nth-child(even) {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.route-badge.shinto11 { background-color: #00a3e0; color: #ffffff; }
-.route-badge.r-406002 { background-color: #ff9100; color: #ffffff; }
-.route-badge.r-403001,
-.route-badge.r-403005 { background-color: #76ff03; color: #000000; }
+/* 系統指定カラー */
+.route-badge.shinto11     { background-color: #00A0E9; color: #ffffff; } /* 水色 */
+.route-badge.r-406002     { background-color: #ED6C00; color: #ffffff; } /* 大31: オレンジ */
+.route-badge.r-d3233      { background-color: #004EA2; color: #ffffff; } /* 大32,33: 青 */
+.route-badge.r-green-std  { background-color: #7CC16D; color: #000000; } /* 大34,35,36,37: 黄緑 */
+.route-badge.r-403003     { background-color: #14B400; color: #ffffff; } /* 大36-1: 濃緑 */
 
 td.vehicle-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); }
 td.destination { font-size: 1.1rem; color: #ffffff; }
@@ -214,7 +215,6 @@ tbody:empty::after {
       <h1>大宮国際中等教育学校周辺バス停 接近表示</h1>
       
       <div class="header-controls">
-        <!-- 行き先絞り込みメニュー -->
         <div class="filter-container">
           <select id="destFilter" onchange="filterAndRender()">
             <option value="all">すべての行き先</option>
@@ -237,7 +237,7 @@ tbody:empty::after {
     </table>
 
     <!-- 2. バス停 ID: 120034 -->
-    <div class="section-title">🚏 バス停 (ID: 120034) 近接情報</div>
+    <div class="section-title">🚏 大宮国際中等教育学校 近接情報</div>
     <table>
       <thead>
         <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -246,7 +246,7 @@ tbody:empty::after {
     </table>
 
     <!-- 3. バス停 ID: 120101 -->
-    <div class="section-title">🚏 バス停 (ID: 120101) 近接情報</div>
+    <div class="section-title">🚏 三橋四丁目 近接情報</div>
     <table>
       <thead>
         <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -257,14 +257,45 @@ tbody:empty::after {
 </div>
 
 <script>
+// 系統設定マップ（系統名・バッジ用CSSクラス・行先定義）
 const ROUTE_CONFIG = {
-  "401007": { name: "新都11", cssClass: "shinto11", destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } },
-  "406002": { name: "大31", cssClass: "r-406002", destinations: { 0: "大宮駅西口", 1: "指扇駅" } },
-  "403001": { name: "大36", cssClass: "r-403001", destinations: { 0: "大宮駅西口", 1: "二ツ宮" } },
-  "403005": { name: "大37", cssClass: "r-403005", destinations: { 0: "大宮駅西口", 1: "馬宮団地" } }
+  "401007": { 
+    name: "新都11", 
+    cssClass: "shinto11", 
+    destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅" } 
+  },
+  "406002": { 
+    name: "大31", 
+    cssClass: "r-406002", 
+    destinations: { 0: "大宮駅西口", 1: "指扇駅" } 
+  },
+  "410001": { 
+    name: "大34", 
+    cssClass: "r-green-std", 
+    destinations: { 0: "大宮駅西口", 1: "ららぽーと富士見" } 
+  },
+  "403006": { 
+    name: "大35", 
+    cssClass: "r-green-std", 
+    destinations: { 0: "大宮駅西口", 1: "所沢駅東口" } 
+  },
+  "403001": { 
+    name: "大36", 
+    cssClass: "r-green-std", 
+    destinations: { 0: "大宮駅西口", 1: "二ツ宮" } 
+  },
+  "403003": { 
+    name: "大36-1", 
+    cssClass: "r-403003", 
+    destinations: { 0: "大宮駅西口", 1: "二ツ宮" } 
+  },
+  "403005": { 
+    name: "大37", 
+    cssClass: "r-green-std", 
+    destinations: { 0: "大宮駅西口", 1: "馬宮団地" } 
+  }
 };
 
-// 取得データを一時保持するグローバル変数
 let cachedBusData = [];
 
 function createRowHtml(bus, showStopName = false) {
@@ -282,7 +313,6 @@ function createRowHtml(bus, showStopName = false) {
   `;
 }
 
-// 選択された条件に基づいて絞り込んで描画する関数
 function filterAndRender() {
   const filterValue = document.getElementById("destFilter").value;
 
@@ -294,7 +324,7 @@ function filterAndRender() {
     } else if (filterValue === "other") {
       return bus.destination !== "大宮駅西口" && bus.destination !== "さいたま新都心駅";
     }
-    return true; // "all"
+    return true;
   });
 
   // 1. 最先着
@@ -362,7 +392,6 @@ async function load(){
 
     allBuses.sort((a, b) => a.etaMin - b.etaMin);
 
-    // グローバル変数にデータをキャッシュして描画関数を呼ぶ
     cachedBusData = allBuses;
     filterAndRender();
 
