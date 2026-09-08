@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>お帰りのバスのご案内</title>
+<title>三橋四丁目接近モニター</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
@@ -210,12 +210,110 @@ tbody:empty::after {
   font-size: 0.85rem;
 }
 
+/* インフォメーションボタン */
+.info-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #28303d;
+  color: #ffffff;
+  border: 2px solid #4a5768;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.info-btn:hover {
+  background-color: #3b4759;
+  transform: scale(1.05);
+}
+
+/* モーダル */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #181d26;
+  border: 2px solid #28303d;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  position: relative;
+  color: #d1dbe5;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #28303d;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #8fa3b8;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.modal-body h3 {
+  font-size: 0.95rem;
+  color: #7CC16D;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.modal-body ul {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+
 @media (max-width: 600px) {
   body { padding: 10px; }
   .hanger-pipes { display: none; }
   th, td { padding: 8px; font-size: 0.85rem; }
   td.destination { font-size: 0.95rem; }
   .route-badge { font-size: 0.8rem; padding: 2px 5px; }
+  .info-btn { bottom: 16px; right: 16px; width: 40px; height: 40px; }
 }
 </style>
 </head>
@@ -226,7 +324,7 @@ tbody:empty::after {
 
   <div class="board-container">
     <div class="board-header">
-      <h1>学校周辺のバス情報</h1>
+      <h1>大宮国際中等教育学校周辺バス停 接近表示</h1>
       
       <div class="header-controls">
         <div class="filter-container">
@@ -243,7 +341,7 @@ tbody:empty::after {
 
     <!-- 到着間近専用セクション（大宮駅西口選択時のみ表示） -->
     <div id="section-approaching" class="section-block" style="display: none;">
-      <div class="section-title approaching-title">まもなく到着するバス（大宮駅西口行き）</div>
+      <div class="section-title approaching-title">🚨 まもなく到着するバス（大宮駅西口行き）</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -254,7 +352,7 @@ tbody:empty::after {
 
     <!-- 1. 最先着 -->
     <div id="section-top" class="section-block">
-      <div class="section-title">最先着便</div>
+      <div class="section-title">⚡ 最先着便（全体で早い順）</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
@@ -265,7 +363,7 @@ tbody:empty::after {
 
     <!-- 2. バス停 120034 -->
     <div id="section-120034" class="section-block">
-      <div class="section-title">大宮国際中等教育学校バス停　近接情報</div>
+      <div class="section-title">🚏 三橋四丁目（大宮方面）近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -276,13 +374,47 @@ tbody:empty::after {
 
     <!-- 3. バス停 120101 -->
     <div id="section-120101" class="section-block">
-      <div class="section-title">三橋四丁目バス停　近接情報</div>
+      <div class="section-title">🚏 三橋四丁目（郊外方面）近接情報</div>
       <table>
         <thead>
           <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
         </thead>
         <tbody id="tbody-120101"></tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- インフォメーションボタン -->
+<button class="info-btn" onclick="toggleModal(true)" aria-label="インフォメーション">ℹ️</button>
+
+<!-- モーダルダイアログ -->
+<div id="infoModal" class="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>インフォメーション</h2>
+      <button class="modal-close" onclick="toggleModal(false)">&times;</button>
+    </div>
+    <div class="modal-body">
+      <h3>このツールについて</h3>
+      <p>大宮国際中等教育学校周辺のバス停（三橋四丁目等）に接近するバスのリアルタイム位置情報を表示するモニターです。</p>
+      <p><strong>ソースコード：</strong>本システムのコードは <a href="https://github.com/hirokiti17/buspro-m" target="_blank" rel="noopener" style="color: #00A0E9;">MIT License</a> のもとGitHubで公開されています。</p>
+      
+      <h3>注意事項</h3>
+      <ul>
+        <li>本サービスが利用するリアルタイムデータは、公共交通オープンデータセンターにおいて提供されるものです。</li>
+        <li>西武バスから提供されたデータを元にしていますが、必ずしも正確・完全なものとは限りません。</li>
+        <li>>本サービスに関するお問い合わせは、西武バスへの直接の問合せは行わず、以下のメールアドレスにお願いします。</li>
+      </ul>
+      <お問い合わせはこちら＞
+      <ul>
+        <li>https://github.com/hirokiti17/buspro-m/issues</li>
+        <li>もしくは</li>
+        <li>https://forms.gle/GcQiamJH3czniuY58</li>
+
+      <h3>制作者</h3>
+      <p>水野・明司（hirokiti17）</p>
+
     </div>
   </div>
 </div>
@@ -305,10 +437,19 @@ const STOP_NAME_MAP = {
   "120101": "三橋四丁目"
 };
 
-// 到着間近とみなす分数（遅延を加算した実用到着時間）
 const APPROACHING_THRESHOLD_MIN = 3;
-
 let cachedBusData = [];
+
+function toggleModal(show) {
+  const modal = document.getElementById("infoModal");
+  modal.style.display = show ? "flex" : "none";
+}
+
+function handleOverlayClick(event) {
+  if (event.target.id === "infoModal") {
+    toggleModal(false);
+  }
+}
 
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
