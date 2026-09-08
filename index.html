@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>お帰りのバスのご案内</title>
+<title>三橋四丁目接近モニター</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku Gothic New:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
 
 :root {
   --bg-color: #1a1d24;
@@ -16,7 +16,7 @@
   --text-main: #ffffff;
   --text-sub: #a0acba;
   --led-green: #00e676;
-  --led-orange: #ff9100;
+  --led-red: #ff5252;
 }
 
 body {
@@ -73,9 +73,9 @@ body {
   top: 0; left: 0; bottom: 0; right: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
-  z-index: 10;
+  z-index: 1;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.25;
 }
 
 .board-header {
@@ -87,6 +87,8 @@ body {
   border-bottom: 3px solid #28303d;
   flex-wrap: wrap;
   gap: 10px;
+  position: relative;
+  z-index: 2;
 }
 
 h1 {
@@ -134,6 +136,20 @@ h1 {
   font-weight: 900;
   border-bottom: 2px solid #242c38;
   border-top: 1px solid #242c38;
+  position: relative;
+  z-index: 2;
+}
+
+/* 到着間近セクションの強調表示 */
+.section-title.approaching-title {
+  background-color: #2b1116;
+  color: #ff8a8a;
+  border-bottom: 2px solid #521d24;
+  border-top: 1px solid #521d24;
+}
+
+.approaching-container {
+  display: none; /* 初期状態では非表示 */
 }
 
 table {
@@ -141,7 +157,7 @@ table {
   width: 100%;
   text-align: left;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 th {
@@ -174,18 +190,17 @@ tbody tr:nth-child(even) {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 系統指定カラー */
-.route-badge.shinto11     { background-color: #00A0E9; color: #ffffff; } /* 水色 */
-.route-badge.r-406002     { background-color: #ED6C00; color: #ffffff; } /* 大31: オレンジ */
-.route-badge.r-d3233      { background-color: #004EA2; color: #ffffff; } /* 大32,33: 青 */
-.route-badge.r-green-std  { background-color: #7CC16D; color: #000000; } /* 大34,35,36,37: 黄緑 */
-.route-badge.r-403003     { background-color: #14B400; color: #ffffff; } /* 大36-1: 濃緑 */
+.route-badge.shinto11     { background-color: #00A0E9; color: #ffffff; }
+.route-badge.r-406002     { background-color: #ED6C00; color: #ffffff; }
+.route-badge.r-d3233      { background-color: #004EA2; color: #ffffff; }
+.route-badge.r-green-std  { background-color: #7CC16D; color: #000000; }
+.route-badge.r-403003     { background-color: #14B400; color: #ffffff; }
 
 td.vehicle-id { font-family: 'Share Tech Mono', monospace; color: var(--text-sub); }
 td.destination { font-size: 1.1rem; color: #ffffff; }
 td.current-stop { color: #d1dbe5; }
 td.eta { color: var(--led-green); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-size: 1.2rem; }
-td.delay { color: var(--led-orange); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; }
+td.delay { color: var(--led-red); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-weight: 900; }
 
 tbody:empty::after {
   content: "該当するバスはありません";
@@ -227,6 +242,17 @@ tbody:empty::after {
       </div>
     </div>
 
+    <!-- 到着間近専用セクション（大宮駅西口選択時のみ動的表示） -->
+    <div id="approaching-section" class="approaching-container">
+      <div class="section-title approaching-title">🚨 まもなく到着するバス（大宮駅西口行き）</div>
+      <table>
+        <thead>
+          <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
+        </thead>
+        <tbody id="tbody-approaching"></tbody>
+      </table>
+    </div>
+
     <!-- 1. 最先着 -->
     <div class="section-title">⚡ 最先着便（全体で早い順）</div>
     <table>
@@ -236,8 +262,8 @@ tbody:empty::after {
       <tbody id="tbody-top"></tbody>
     </table>
 
-    <!-- 2. バス停 ID: 120034 -->
-    <div class="section-title">🚏 大宮国際中等教育学校 近接情報</div>
+    <!-- 2. バス停 120034 -->
+    <div class="section-title">🚏 三橋四丁目（大宮方面）近接情報</div>
     <table>
       <thead>
         <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
@@ -245,11 +271,11 @@ tbody:empty::after {
       <tbody id="tbody-120034"></tbody>
     </table>
 
-    <!-- 3. バス停 ID: 120101 -->
-    <div class="section-title">🚏 三橋四丁目 近接情報</div>
+    <!-- 3. バス停 120101 -->
+    <div class="section-title">🚏 三橋四丁目（郊外方面）近接情報</div>
     <table>
       <thead>
-        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
+        <tr><th>系統</th><th>車両</th><th>行先</th><th>到着</th><th>遅延</th></tr>
       </thead>
       <tbody id="tbody-120101"></tbody>
     </table>
@@ -267,17 +293,18 @@ const ROUTE_CONFIG = {
   "403005": { name: "大37", cssClass: "r-green-std", destinations: { 0: "大宮駅西口", 1: "馬宮団地" } }
 };
 
-// バス停IDに対する画面表示名
 const STOP_NAME_MAP = {
   "120034": "大宮国際中等教育学校",
   "120101": "三橋四丁目"
 };
 
+// 到着間近とみなす分数（閾値）
+const APPROACHING_THRESHOLD_MIN = 3;
+
 let cachedBusData = [];
 
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
-  // マップから表示名を取得（なければIDをフォールバック表示）
   const stopDisplayName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
 
   return `
@@ -306,6 +333,20 @@ function filterAndRender() {
     }
     return true;
   });
+
+  // --- 到着間近（大宮駅西口指定時のみ判定・表示） ---
+  const approachingContainer = document.getElementById("approaching-section");
+  if (filterValue === "omiya") {
+    const approachingBuses = filteredBuses.filter(b => b.etaMin <= APPROACHING_THRESHOLD_MIN);
+    if (approachingBuses.length > 0) {
+      document.getElementById("tbody-approaching").innerHTML = approachingBuses.map(b => createRowHtml(b, true)).join("");
+      approachingContainer.style.display = "block";
+    } else {
+      approachingContainer.style.display = "none";
+    }
+  } else {
+    approachingContainer.style.display = "none";
+  }
 
   // 1. 最先着
   const topBuses = filteredBuses.slice(0, 3);
