@@ -128,6 +128,10 @@ h1 {
   border: 1px solid #28303d;
 }
 
+.section-block {
+  display: block;
+}
+
 .section-title {
   background-color: #12161f;
   color: #78899a;
@@ -140,16 +144,11 @@ h1 {
   z-index: 2;
 }
 
-/* 到着間近セクションの強調表示 */
 .section-title.approaching-title {
   background-color: #2b1116;
   color: #ff8a8a;
   border-bottom: 2px solid #521d24;
   border-top: 1px solid #521d24;
-}
-
-.approaching-container {
-  display: none; /* 初期状態では非表示 */
 }
 
 table {
@@ -242,8 +241,8 @@ tbody:empty::after {
       </div>
     </div>
 
-    <!-- 到着間近専用セクション（大宮駅西口選択時のみ動的表示） -->
-    <div id="approaching-section" class="approaching-container">
+    <!-- 到着間近専用セクション（大宮駅西口選択時のみ表示） -->
+    <div id="section-approaching" class="section-block" style="display: none;">
       <div class="section-title approaching-title">🚨 まもなく到着するバス（大宮駅西口行き）</div>
       <table>
         <thead>
@@ -254,31 +253,37 @@ tbody:empty::after {
     </div>
 
     <!-- 1. 最先着 -->
-    <div class="section-title">⚡ 最先着便（全体で早い順）</div>
-    <table>
-      <thead>
-        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
-      </thead>
-      <tbody id="tbody-top"></tbody>
-    </table>
+    <div id="section-top" class="section-block">
+      <div class="section-title">⚡ 最先着便（全体で早い順）</div>
+      <table>
+        <thead>
+          <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>対象バス停</th><th>到着</th><th>遅延</th></tr>
+        </thead>
+        <tbody id="tbody-top"></tbody>
+      </table>
+    </div>
 
     <!-- 2. バス停 120034 -->
-    <div class="section-title">🚏 三橋四丁目（大宮方面）近接情報</div>
-    <table>
-      <thead>
-        <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
-      </thead>
-      <tbody id="tbody-120034"></tbody>
-    </table>
+    <div id="section-120034" class="section-block">
+      <div class="section-title">🚏 三橋四丁目（大宮方面）近接情報</div>
+      <table>
+        <thead>
+          <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
+        </thead>
+        <tbody id="tbody-120034"></tbody>
+      </table>
+    </div>
 
     <!-- 3. バス停 120101 -->
-    <div class="section-title">🚏 三橋四丁目（郊外方面）近接情報</div>
-    <table>
-      <thead>
-        <tr><th>系統</th><th>車両</th><th>行先</th><th>到着</th><th>遅延</th></tr>
-      </thead>
-      <tbody id="tbody-120101"></tbody>
-    </table>
+    <div id="section-120101" class="section-block">
+      <div class="section-title">🚏 三橋四丁目（郊外方面）近接情報</div>
+      <table>
+        <thead>
+          <tr><th>系統</th><th>車両</th><th>行先</th><th>現在地</th><th>到着</th><th>遅延</th></tr>
+        </thead>
+        <tbody id="tbody-120101"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -298,7 +303,7 @@ const STOP_NAME_MAP = {
   "120101": "三橋四丁目"
 };
 
-// 到着間近とみなす分数（閾値）
+// 到着間近とみなす分数（遅延を加算した実用到着時間）
 const APPROACHING_THRESHOLD_MIN = 3;
 
 let cachedBusData = [];
@@ -314,8 +319,8 @@ function createRowHtml(bus, showStopName = false) {
       <td class="destination">${bus.destination}</td>
       <td class="current-stop">${bus.currentStop}</td>
       ${showStopName ? `<td style="color:#8fa3b8; font-size:0.85rem;">${stopDisplayName}</td>` : ''}
-      <td class="eta">${bus.etaMin}分</td>
-      <td class="delay">${bus.delay}分</td>
+      <td class="eta">${bus.totalEtaMin}分</td>
+      <td class="delay">${bus.delay > 0 ? `+${bus.delay}` : bus.delay}分</td>
     </tr>
   `;
 }
@@ -334,31 +339,43 @@ function filterAndRender() {
     return true;
   });
 
-  // --- 到着間近（大宮駅西口指定時のみ判定・表示） ---
-  const approachingContainer = document.getElementById("approaching-section");
+  const sectionApproaching = document.getElementById("section-approaching");
+  const sectionTop = document.getElementById("section-top");
+  const section120034 = document.getElementById("section-120034");
+  const section120101 = document.getElementById("section-120101");
+
   if (filterValue === "omiya") {
-    const approachingBuses = filteredBuses.filter(b => b.etaMin <= APPROACHING_THRESHOLD_MIN);
+    // 「大宮駅西口」フィルター選択時：
+    // 遅延加算後の到着時間が指定分数（3分）以内の便を取得
+    const approachingBuses = filteredBuses.filter(b => b.totalEtaMin <= APPROACHING_THRESHOLD_MIN);
+
     if (approachingBuses.length > 0) {
       document.getElementById("tbody-approaching").innerHTML = approachingBuses.map(b => createRowHtml(b, true)).join("");
-      approachingContainer.style.display = "block";
+      sectionApproaching.style.display = "block";
     } else {
-      approachingContainer.style.display = "none";
+      sectionApproaching.style.display = "none";
     }
+
+    // 各テーブルのレンダリング
+    document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
+    document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
+    
+    // 郊外方面バス停（120101）は大宮駅西口行きが来ないため非表示に
+    section120101.style.display = "none";
+    sectionTop.style.display = "block";
+    section120034.style.display = "block";
+
   } else {
-    approachingContainer.style.display = "none";
+    // 通常表示（すべての行き先、または他のフィルター選択時）
+    sectionApproaching.style.display = "none";
+    sectionTop.style.display = "block";
+    section120034.style.display = "block";
+    section120101.style.display = "block";
+
+    document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
+    document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
+    document.getElementById("tbody-120101").innerHTML = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3).map(b => createRowHtml(b, false)).join("");
   }
-
-  // 1. 最先着
-  const topBuses = filteredBuses.slice(0, 3);
-  document.getElementById("tbody-top").innerHTML = topBuses.map(b => createRowHtml(b, true)).join("");
-
-  // 2. バス停 120034
-  const buses120034 = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3);
-  document.getElementById("tbody-120034").innerHTML = buses120034.map(b => createRowHtml(b, false)).join("");
-
-  // 3. バス停 120101
-  const buses120101 = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3);
-  document.getElementById("tbody-120101").innerHTML = buses120101.map(b => createRowHtml(b, false)).join("");
 }
 
 async function load(){
@@ -388,10 +405,13 @@ async function load(){
 
             if(matchedStopId) {
                 const arrival = Number(s.arrival.time) * 1000;
-                const etaMin = Math.round((arrival - Date.now()) / 60000);
-                const delay = Math.round(s.arrival.delay / 60);
+                const scheduledEtaMin = Math.round((arrival - Date.now()) / 60000);
+                const delay = Math.round((s.arrival.delay || 0) / 60);
 
-                if(etaMin >= 0) {
+                // 定時到着予定 + 遅延時間 = 実際の到着予測時間
+                const totalEtaMin = scheduledEtaMin + delay;
+
+                if(totalEtaMin >= 0) {
                     const config = ROUTE_CONFIG[routeId];
                     const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
                         ? config.destinations[vehicle.trip.directionId]
@@ -403,7 +423,7 @@ async function load(){
                         vehicleLabel: vehicle.vehicle.label,
                         destination: destName,
                         currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
-                        etaMin: etaMin,
+                        totalEtaMin: totalEtaMin,
                         delay: delay
                     });
                 }
@@ -411,7 +431,8 @@ async function load(){
         });
     });
 
-    allBuses.sort((a, b) => a.etaMin - b.etaMin);
+    // 遅延を加算した後の「実際の到着時間」順に並び替え
+    allBuses.sort((a, b) => a.totalEtaMin - b.totalEtaMin);
 
     cachedBusData = allBuses;
     filterAndRender();
