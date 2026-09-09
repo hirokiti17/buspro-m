@@ -582,7 +582,7 @@ async function loadNews() {
   console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
 
   // 【修正】GAS_URL が空、または初期値（YOUR_GAS_URL）が含まれている時だけ中断する
-  const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_URL");
+  const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL === "YOUR_GAS_URL";
 
   if (isInvalidUrl) {
     console.log("② [中断] GAS_URLが正しく設定されていません");
