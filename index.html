@@ -581,15 +581,13 @@ async function loadNews() {
   console.log("① loadNews が呼び出されました");
   console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
 
-  // 【修正】GAS_URL が空、または初期値（YOUR_GAS_URL）が含まれている時だけ中断する
-  const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL === "__GAS_URL__";
-
-  if (isInvalidUrl) {
-    console.log("② [中断] GAS_URLが正しく設定されていません");
+  // CONFIG.GAS_URL が存在しない場合（空文字など）のみ処理を中断
+  if (!CONFIG.GAS_URL) {
+    console.log("② [中断] GAS_URLが設定されていません");
     return;
   }
 
-  console.log("② [通過] 正しいURLのため、次の処理に進みます");
+  console.log("② [通過] 取得処理を開始します");
 
   const cacheKey = "bus_news_cache";
   const cacheTimeKey = "bus_news_time";
@@ -608,7 +606,7 @@ async function loadNews() {
 
   // 通信実行
   try {
-    console.log("④ fetch を実行します！");
+    console.log("④ fetch を実行します:", CONFIG.GAS_URL);
     const res = await fetch(CONFIG.GAS_URL);
     const data = await res.json();
     console.log("⑤ データ取得成功:", data);
@@ -623,6 +621,7 @@ async function loadNews() {
     if (cachedData) renderTicker(JSON.parse(cachedData));
   }
 }
+
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
   const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
