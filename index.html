@@ -201,7 +201,7 @@ td.current-stop { color: #d1dbe5; }
 td.eta { color: var(--led-green); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-size: 1.2rem; }
 td.delay { color: var(--led-red); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-weight: 900; }
 
-/* 文字のみの点滅アニメーション */
+/* デジタル点滅アニメーション（step-endでグラデーションを排除） */
 @keyframes blinkTextAnimation {
   0%, 100% {
     opacity: 1;
@@ -209,13 +209,12 @@ td.delay { color: var(--led-red); font-family: 'Share Tech Mono', 'Zen Kaku Goth
     text-shadow: 0 0 6px rgba(255, 213, 79, 0.4);
   }
   50% {
-    opacity: 0.25;
-    color: #ffd54f;
+    opacity: 0.15;
   }
 }
 
 .blink-text-span {
-  animation: blinkTextAnimation 1.2s infinite ease-in-out;
+  animation: blinkTextAnimation 1s step-end infinite;
   font-weight: 900;
 }
 
@@ -383,7 +382,7 @@ tbody:empty::after {
   color: #ff9800; /* オレンジ色 */
   font-weight: 900;
   margin-right: 4px;
-  animation: tickerCategoryBlink 1.2s infinite ease-in-out;
+  animation: tickerCategoryBlink 1s step-end infinite;
 }
 
 @keyframes tickerCategoryBlink {
@@ -392,7 +391,7 @@ tbody:empty::after {
     text-shadow: 0 0 8px rgba(255, 152, 0, 0.6);
   }
   50% {
-    opacity: 0.3;
+    opacity: 0.15;
   }
 }
 
