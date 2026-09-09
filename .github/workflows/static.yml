@@ -29,10 +29,9 @@ jobs:
           WORKER_URL: ${{ secrets.WORKER_URL }}
           GAS_URL: ${{ secrets.GAS_URL }}
         run: |
-          # index.html 内のプレースホルダーを Secrets の値に置換
-          sed -i "s|YOUR_SERVER_URL|${WORKER_URL}|g" index.html
-          sed -i "s|YOUR_GAS_URL|${GAS_URL}|g" index.html
-
+          # Secrets の名前はそのまま、置換対象の文字だけを変更
+          sed -i "s|__WORKER_URL__|${WORKER_URL}|g" index.html
+          sed -i "s|__GAS_URL__|${GAS_URL}|g" index.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
