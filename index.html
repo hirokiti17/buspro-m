@@ -6,7 +6,7 @@
 <title>お帰りのバスのご案内</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+KakuGothic+New:wght@700;900&display=swap');
 
 :root {
   --bg-color: #1a1d24;
@@ -200,6 +200,24 @@ td.destination { font-size: 1.1rem; color: #ffffff; }
 td.current-stop { color: #d1dbe5; }
 td.eta { color: var(--led-green); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-size: 1.2rem; }
 td.delay { color: var(--led-red); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-weight: 900; }
+
+/* 文字のみの点滅アニメーション（視認性の高いアンバー・ゴールド色） */
+@keyframes blinkTextAnimation {
+  0%, 100% {
+    opacity: 1;
+    color: #ffd54f;
+    text-shadow: 0 0 6px rgba(255, 213, 79, 0.4);
+  }
+  50% {
+    opacity: 0.25;
+    color: #ffd54f;
+  }
+}
+
+.blink-text-span {
+  animation: blinkTextAnimation 1.2s infinite ease-in-out;
+  font-weight: 900;
+}
 
 tbody:empty::after {
   content: "該当するバスはありません";
@@ -499,7 +517,13 @@ function handleOverlayClick(event) {
 
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
-  const stopDisplayName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
+  const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
+  
+  // 三橋四丁目の場合は文字部分（<span>）のみに点滅アニメーションと明るい色を適用
+  const isMitsuhashi = bus.targetStopId === "120101";
+  const stopDisplayHtml = isMitsuhashi 
+    ? `<span class="blink-text-span">${rawStopName}</span>` 
+    : rawStopName;
 
   return `
     <tr>
@@ -507,7 +531,7 @@ function createRowHtml(bus, showStopName = false) {
       <td class="vehicle-id">${bus.vehicleLabel}</td>
       <td class="destination">${bus.destination}</td>
       <td class="current-stop">${bus.currentStop}</td>
-      ${showStopName ? `<td style="color:#8fa3b8; font-size:0.85rem;">${stopDisplayName}</td>` : ''}
+      ${showStopName ? `<td style="font-size:0.85rem;">${stopDisplayHtml}</td>` : ''}
       <td class="eta">${bus.totalEtaMin}分</td>
       <td class="delay">${bus.delay > 0 ? `+${bus.delay}` : bus.delay}分</td>
     </tr>
@@ -533,6 +557,11 @@ function filterAndRender() {
   const section120034 = document.getElementById("section-120034");
   const section120101 = document.getElementById("section-120101");
 
+  // 常に全主要セクションを表示
+  sectionTop.style.display = "block";
+  section120034.style.display = "block";
+  section120101.style.display = "block";
+
   if (filterValue === "omiya") {
     const approachingBuses = filteredBuses.filter(b => b.totalEtaMin <= APPROACHING_THRESHOLD_MIN);
 
@@ -542,24 +571,14 @@ function filterAndRender() {
     } else {
       sectionApproaching.style.display = "none";
     }
-
-    document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
-    document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
-    
-    section120101.style.display = "none";
-    sectionTop.style.display = "block";
-    section120034.style.display = "block";
-
   } else {
     sectionApproaching.style.display = "none";
-    sectionTop.style.display = "block";
-    section120034.style.display = "block";
-    section120101.style.display = "block";
-
-    document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
-    document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
-    document.getElementById("tbody-120101").innerHTML = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3).map(b => createRowHtml(b, false)).join("");
   }
+
+  // テーブルデータの描画
+  document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
+  document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
+  document.getElementById("tbody-120101").innerHTML = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3).map(b => createRowHtml(b, false)).join("");
 }
 
 async function load(){
