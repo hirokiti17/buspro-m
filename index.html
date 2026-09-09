@@ -374,6 +374,53 @@ tbody:empty::after {
   .info-btn { bottom: 16px; right: 16px; width: 44px; height: 44px; }
   .info-btn svg { width: 18px; height: 18px; }
 }
+  /* --- お知らせテロップ用スタイル --- */
+.ticker-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  background-color: #0d1117;
+  border-top: 1px solid #28303d;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.ticker-text {
+  display: inline-block;
+  padding-left: 100%;
+  color: var(--led-green);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  animation: ticker-animation 25s linear infinite;
+}
+
+.ticker-text span.highlight {
+  color: #ffd54f; /* テロップ内の強調カラー */
+  margin-right: 8px;
+}
+
+@keyframes ticker-animation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* モバイル表示時のインフォメーションボタンとテロップの重なり防止 */
+@media (max-width: 600px) {
+  .info-btn {
+    bottom: 48px;
+  }
+}
 </style>
 </head>
 <body>
@@ -677,5 +724,10 @@ load();
 startPolling();
 </script>
 
+  <div class="ticker-container">
+  <div class="ticker-text">
+    <span class="highlight">【テスト】</span>お知らせが　右から左へスクロール
+  </div>
+</div>
 </body>
 </html>
