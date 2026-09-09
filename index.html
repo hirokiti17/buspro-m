@@ -532,9 +532,9 @@ tbody:empty::after {
 // --- 環境変数設定エリア ---
 const CONFIG = {
   // Server API URL
-  WORKER_URL: "YOUR_SERVER_URL",
+  WORKER_URL: "__WORKER_URL__",
   // Google Apps Script (GAS) デプロイ済 Web アプリ URL
-  GAS_URL: "YOUR_GAS_URL"
+  GAS_URL: "__GAS_URL__"
 };
 
 const ROUTE_CONFIG = {
@@ -582,7 +582,7 @@ async function loadNews() {
   console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
 
   // 【修正】GAS_URL が空、または初期値（YOUR_GAS_URL）が含まれている時だけ中断する
-  const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL === "YOUR_GAS_URL";
+  const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL === "__GAS_URL__";
 
   if (isInvalidUrl) {
     console.log("② [中断] GAS_URLが正しく設定されていません");
