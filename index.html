@@ -505,7 +505,7 @@ tbody:empty::after {
     </div>
     <div class="modal-body">
       <h3>このツールについて</h3>
-      <p>大宮国際中等教育学校周辺のバス停（三橋四丁目等）に接近するバスのリアルタイム位置情報を表示するモニターです。</p>
+      <p>大宮国際中等教育学校周辺のバス停に接近するバスのリアルタイム位置情報を表示するモニターです。</p>
       <p><strong>ソースコード：</strong>本システムのコードは <a href="https://github.com/hirokiti17/buspro-m" target="_blank" rel="noopener" style="color: #00A0E9;">MIT License</a> のもとGitHubで公開されています。</p>
       
       <h3>注意事項</h3>
@@ -571,9 +571,9 @@ function handleOverlayClick(event) {
 // --- お知らせデータ（GAS）読み込み処理 ---
 async function loadNews() {
   // 未設定の場合はデフォルトメッセージを表示
-  if (!CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_DEPLOYMENT_ID")) {
-    return;
-  }
+  if (!CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_URL")) {
+  return;
+}
 
   const cacheKey = "bus_news_cache";
   const cacheTimeKey = "bus_news_time";
