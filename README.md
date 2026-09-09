@@ -69,5 +69,5 @@
 * 本サービスについて、西武バス株式会社様へ直接のお問い合わせをする行為はご遠慮ください。
 
 ### 作者 / お問い合わせ
-* 制作: 水野・明司（hirokiti17）
+* 制作: 水野（N3851）・明司（hirokiti17）
 * バグ報告・ご意見等: [GitHub Issues](https://github.com/hirokiti17/buspro-m/issues) または [Googleフォーム](https://forms.gle/GcQiamJH3czniuY58)
