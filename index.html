@@ -581,7 +581,7 @@ async function loadNews() {
   console.log("① loadNews が呼び出されました");
   console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
 
-  // CONFIG.GAS_URL が存在しない場合（空文字など）のみ処理を中断
+  // CONFIG.GAS_URL の値が存在しない場合（空文字など）のみ処理を中断
   if (!CONFIG.GAS_URL) {
     console.log("② [中断] GAS_URLが設定されていません");
     return;
