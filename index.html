@@ -578,11 +578,18 @@ function renderTicker(data) {
 }
 
 async function loadNews() {
-  // 1. URLが未設定、または初期値（YOUR_GAS_URL）が含まれている場合のみ処理を中断
+  console.log("① loadNews が呼び出されました");
+  console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
+
+  // 【修正】GAS_URL が空、または初期値（YOUR_GAS_URL）が含まれている時だけ中断する
   const isInvalidUrl = !CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_URL");
+
   if (isInvalidUrl) {
+    console.log("② [中断] GAS_URLが正しく設定されていません");
     return;
   }
+
+  console.log("② [通過] 正しいURLのため、次の処理に進みます");
 
   const cacheKey = "bus_news_cache";
   const cacheTimeKey = "bus_news_time";
@@ -592,20 +599,23 @@ async function loadNews() {
   const cachedData = localStorage.getItem(cacheKey);
   const lastFetch = localStorage.getItem(cacheTimeKey);
 
-  // 2. キャッシュの判定（10分以内ならキャッシュを使用）
-  if (cachedData && lastFetch && (now - Number(lastFetch) < TEN_MINUTES)) {
+  // 10分以内のキャッシュ判定
+  if (cachedData && lastFetch && (now - lastFetch < TEN_MINUTES)) {
+    console.log("③ 10分以内のキャッシュを表示します（fetchはスキップ）");
     renderTicker(JSON.parse(cachedData));
     return;
   }
 
-  // 3. 通信処理
+  // 通信実行
   try {
+    console.log("④ fetch を実行します！");
     const res = await fetch(CONFIG.GAS_URL);
     const data = await res.json();
+    console.log("⑤ データ取得成功:", data);
 
     if (Array.isArray(data) && data.length > 0) {
       localStorage.setItem(cacheKey, JSON.stringify(data));
-      localStorage.setItem(cacheTimeKey, now.toString());
+      localStorage.setItem(cacheTimeKey, now);
       renderTicker(data);
     }
   } catch (error) {
@@ -613,7 +623,6 @@ async function loadNews() {
     if (cachedData) renderTicker(JSON.parse(cachedData));
   }
 }
-
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
   const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
