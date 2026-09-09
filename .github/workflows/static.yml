@@ -23,7 +23,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Replace Placeholder with Secrets
         env:
           WORKER_URL: ${{ secrets.WORKER_URL }}
