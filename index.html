@@ -365,30 +365,18 @@ tbody:empty::after {
   text-decoration: underline;
 }
 
-@media (max-width: 600px) {
-  body { padding: 10px; }
-  .hanger-pipes { display: none; }
-  th, td { padding: 8px; font-size: 0.85rem; }
-  td.destination { font-size: 0.95rem; }
-  .route-badge { font-size: 0.8rem; padding: 2px 5px; }
-  .info-btn { bottom: 16px; right: 16px; width: 44px; height: 44px; }
-  .info-btn svg { width: 18px; height: 18px; }
-}
-  /* --- お知らせテロップ用スタイル --- */
+/* --- 掲示板下部のお知らせテロップ用スタイル --- */
 .ticker-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 36px;
-  background-color: #0d1117;
-  border-top: 1px solid #28303d;
+  height: 38px;
+  background: #090c10;
+  border-top: 2px solid #242c38;
   overflow: hidden;
   white-space: nowrap;
-  z-index: 900;
+  z-index: 2;
   display: flex;
   align-items: center;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .ticker-text {
@@ -402,7 +390,7 @@ tbody:empty::after {
 }
 
 .ticker-text span.highlight {
-  color: #ffd54f; /* テロップ内の強調カラー */
+  color: #ffd54f;
   margin-right: 8px;
 }
 
@@ -415,11 +403,14 @@ tbody:empty::after {
   }
 }
 
-/* モバイル表示時のインフォメーションボタンとテロップの重なり防止 */
 @media (max-width: 600px) {
-  .info-btn {
-    bottom: 48px;
-  }
+  body { padding: 10px; }
+  .hanger-pipes { display: none; }
+  th, td { padding: 8px; font-size: 0.85rem; }
+  td.destination { font-size: 0.95rem; }
+  .route-badge { font-size: 0.8rem; padding: 2px 5px; }
+  .info-btn { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+  .info-btn svg { width: 18px; height: 18px; }
 }
 </style>
 </head>
@@ -487,6 +478,13 @@ tbody:empty::after {
         </thead>
         <tbody id="tbody-120101"></tbody>
       </table>
+    </div>
+
+    <!-- お知らせテロップ -- ----------------------------------------------------------------------------------重要>
+    <div class="ticker-container">
+      <div class="ticker-text">
+        <span class="highlight">【お知らせ】</span>バスの接近情報は約30秒ごとに自動更新されます。道路状況により実際の到着時間と異なる場合がありますのでご注意ください。
+      </div>
     </div>
   </div>
 </div>
@@ -566,7 +564,6 @@ function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
   const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
   
-  // 三橋四丁目の場合は文字部分（<span>）のみに点滅アニメーションと明るい色を適用
   const isMitsuhashi = bus.targetStopId === "120101";
   const stopDisplayHtml = isMitsuhashi 
     ? `<span class="blink-text-span">${rawStopName}</span>` 
@@ -604,7 +601,6 @@ function filterAndRender() {
   const section120034 = document.getElementById("section-120034");
   const section120101 = document.getElementById("section-120101");
 
-  // 常に全主要セクションを表示
   sectionTop.style.display = "block";
   section120034.style.display = "block";
   section120101.style.display = "block";
@@ -622,7 +618,6 @@ function filterAndRender() {
     sectionApproaching.style.display = "none";
   }
 
-  // テーブルデータの描画
   document.getElementById("tbody-top").innerHTML = filteredBuses.slice(0, 3).map(b => createRowHtml(b, true)).join("");
   document.getElementById("tbody-120034").innerHTML = filteredBuses.filter(b => b.targetStopId === "120034").slice(0, 3).map(b => createRowHtml(b, false)).join("");
   document.getElementById("tbody-120101").innerHTML = filteredBuses.filter(b => b.targetStopId === "120101").slice(0, 3).map(b => createRowHtml(b, false)).join("");
@@ -688,18 +683,14 @@ async function load(){
     document.getElementById("status").textContent = "更新 " + new Date().toLocaleTimeString();
 }
 
-
 let timerId = null;
 
-// 自動更新を開始する関数
 function startPolling() {
   if (!timerId) {
-    // 30秒ごとにデータ更新
     timerId = setInterval(load, 30000);
   }
 }
 
-// 自動更新を停止する関数
 function stopPolling() {
   if (timerId) {
     clearInterval(timerId);
@@ -707,27 +698,18 @@ function stopPolling() {
   }
 }
 
-// タブの表示/非表示状態を監視
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    // タブが裏に隠れたら更新をストップ（Workersへのリクエストをカット）
     stopPolling();
   } else {
-    // タブが再び表に戻ってきたら即時再読み込み＆定期更新を再開
     load();
     startPolling();
   }
 });
 
-// 初回読み込みとタイマー開始
 load();
 startPolling();
 </script>
 
-  <div class="ticker-container">
-  <div class="ticker-text">
-    <span class="highlight">【テスト】</span>お知らせが　右から左へスクロール
-  </div>
-</div>
 </body>
 </html>
