@@ -20,7 +20,7 @@
 ## 使用技術
 
 * **フロントエンド:** HTML5 / CSS3 / JavaScript (Vanilla JS)
-* **バックエンド / API:** Cloudflare Workers (バスデータ取得・整形プロキシ)
+* **バックエンド / API:** Cloudflare Workers (バスデータ取得・キャッシュ・整形プロキシ)
 * **データソース:** [公共交通オープンデータセンター](https://www.odpt.org/) (西武バス GTFS-RTデータ)
 
 ---
