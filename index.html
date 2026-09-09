@@ -641,8 +641,40 @@ async function load(){
     document.getElementById("status").textContent = "更新 " + new Date().toLocaleTimeString();
 }
 
+
+let timerId = null;
+
+// 自動更新を開始する関数
+function startPolling() {
+  if (!timerId) {
+    // 30秒ごとにデータ更新
+    timerId = setInterval(load, 30000);
+  }
+}
+
+// 自動更新を停止する関数
+function stopPolling() {
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+}
+
+// タブの表示/非表示状態を監視
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    // タブが裏に隠れたら更新をストップ（Workersへのリクエストをカット）
+    stopPolling();
+  } else {
+    // タブが再び表に戻ってきたら即時再読み込み＆定期更新を再開
+    load();
+    startPolling();
+  }
+});
+
+// 初回読み込みとタイマー開始
 load();
-setInterval(load, 30000);
+startPolling();
 </script>
 
 </body>
