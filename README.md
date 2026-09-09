@@ -50,7 +50,7 @@
  1. **GitHub Secrets の設定**
    リポジトリの `Settings > Environments > github-pages > Environment secrets` に以下を登録します。
    * `__WORKER_URL__`: Cloudflare Worker のエンドポイントURL
-   * `__GAS_URL__`: Google Apps Script のウェブアプリURL (`https://script.google.com/macros/s/.../exec`)
+   * `__GAS_URL__`: Google Apps Script のウェブアプリURL (https://script.google.com/macros/s/.../exec)
  2. **自動デプロイ**
    `main` ブランチにコードを Push すると、GitHub Actions が HTML 内のプレースホルダーを置換し、GitHub Pages へ自動デプロイされます。
  ### GitHub Pages以外での構築にはまだ対応しておりません。アップデートをお待ちください。
