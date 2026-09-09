@@ -612,7 +612,6 @@ async function loadNews() {
     if (cachedData) renderTicker(JSON.parse(cachedData));
   }
 }
-}
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
   const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
