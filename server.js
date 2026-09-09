@@ -13315,10 +13315,10 @@ var index_default = {
     }
     try {
       const vehicleRes = await fetch(
-        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_vehicle?acl:consumerKey=vbexkf3r92gxedqv81bnlr4ogta82oqu3ps60f35c5fww7aixzwilr6b2889c3qz`
+        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_vehicle?acl:consumerKey=YOUR_API_KEY`
       );
       const tripRes = await fetch(
-        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_trip_update?acl:consumerKey=vbexkf3r92gxedqv81bnlr4ogta82oqu3ps60f35c5fww7aixzwilr6b2889c3qz`
+        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_trip_update?acl:consumerKey=YOUR_API_KEY`
       );
       if (!vehicleRes.ok || !tripRes.ok) {
         throw new Error("\u897F\u6B66\u30D0\u30B9API\u304B\u3089\u306E\u30C7\u30FC\u30BF\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
