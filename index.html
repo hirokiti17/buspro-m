@@ -571,9 +571,20 @@ function handleOverlayClick(event) {
 function renderTicker(data) {
   const container = document.getElementById("ticker-content");
   if (!container) return;
+
   if (Array.isArray(data) && data.length > 0) {
-    const text = data.map(item => item.text || item).join("  ");
-    container.innerHTML = `<span class="highlight">【お知らせ】</span>${text}`;
+    // item.message (および category) を取り出して結合する
+    const text = data.map(item => {
+      // オブジェクト形式 { category: "...", message: "..." } の場合
+      if (typeof item === 'object' && item !== null) {
+        const cat = item.category ? `【${item.category}】` : '';
+        return `${cat}${item.message || ''}`;
+      }
+      // 単なる文字列の配列だった場合のフォールバック
+      return item;
+    }).join("   "); // メッセージ間のスペース
+
+    container.innerHTML = `<span class="highlight"></span>${text}`;
   }
 }
 
