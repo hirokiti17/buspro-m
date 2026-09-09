@@ -568,16 +568,17 @@ function handleOverlayClick(event) {
   }
 }
 
-// --- お知らせデータ（GAS）読み込み処理 ---
 async function loadNews() {
   console.log("① loadNews が呼び出されました");
   console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
 
-  // 未設定の場合はデフォルトメッセージを表示
+  // 1. URLが未設定、またはダミー（YOUR_GAS_URL）のままの時だけ弾く
   if (!CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_URL")) {
-    console.log("② GAS_URL が未設定または YOUR_GAS_URL のため処理を中断しました");
+    console.log("② [中断] GAS_URLが設定されていません");
     return;
   }
+
+  console.log("② [通過] 正しいURLがセットされているため、次の処理に進みます");
 
   const cacheKey = "bus_news_cache";
   const cacheTimeKey = "bus_news_time";
@@ -587,20 +588,19 @@ async function loadNews() {
   const cachedData = localStorage.getItem(cacheKey);
   const lastFetch = localStorage.getItem(cacheTimeKey);
 
-  console.log("キャッシュ確認:", { cachedData, lastFetch, diff: now - lastFetch });
-
-  // 10分以内のキャッシュがあればそれを使用
+  // 2. キャッシュの判定
   if (cachedData && lastFetch && (now - lastFetch < TEN_MINUTES)) {
-    console.log("③ 10分以内のキャッシュが存在するため、fetchを行わずキャッシュを表示します");
+    console.log("③ 10分以内のキャッシュを表示します（通信はスキップ）");
     renderTicker(JSON.parse(cachedData));
     return;
   }
 
+  // 3. 通信処理
   try {
-    console.log("④ fetch を実行します:", CONFIG.GAS_URL);
+    console.log("④ fetch を実行します！");
     const res = await fetch(CONFIG.GAS_URL);
     const data = await res.json();
-    console.log("⑤ GASからのレスポンスデータ:", data);
+    console.log("⑤ データ取得成功:", data);
 
     if (Array.isArray(data) && data.length > 0) {
       localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -611,6 +611,7 @@ async function loadNews() {
     console.error("お知らせの取得に失敗しました:", error);
     if (cachedData) renderTicker(JSON.parse(cachedData));
   }
+}
 }
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
