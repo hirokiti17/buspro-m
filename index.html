@@ -570,10 +570,14 @@ function handleOverlayClick(event) {
 
 // --- お知らせデータ（GAS）読み込み処理 ---
 async function loadNews() {
+  console.log("① loadNews が呼び出されました");
+  console.log("現在の CONFIG.GAS_URL:", CONFIG.GAS_URL);
+
   // 未設定の場合はデフォルトメッセージを表示
   if (!CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_URL")) {
-  return;
-}
+    console.log("② GAS_URL が未設定または YOUR_GAS_URL のため処理を中断しました");
+    return;
+  }
 
   const cacheKey = "bus_news_cache";
   const cacheTimeKey = "bus_news_time";
@@ -583,15 +587,20 @@ async function loadNews() {
   const cachedData = localStorage.getItem(cacheKey);
   const lastFetch = localStorage.getItem(cacheTimeKey);
 
+  console.log("キャッシュ確認:", { cachedData, lastFetch, diff: now - lastFetch });
+
   // 10分以内のキャッシュがあればそれを使用
   if (cachedData && lastFetch && (now - lastFetch < TEN_MINUTES)) {
+    console.log("③ 10分以内のキャッシュが存在するため、fetchを行わずキャッシュを表示します");
     renderTicker(JSON.parse(cachedData));
     return;
   }
 
   try {
+    console.log("④ fetch を実行します:", CONFIG.GAS_URL);
     const res = await fetch(CONFIG.GAS_URL);
     const data = await res.json();
+    console.log("⑤ GASからのレスポンスデータ:", data);
 
     if (Array.isArray(data) && data.length > 0) {
       localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -603,18 +612,6 @@ async function loadNews() {
     if (cachedData) renderTicker(JSON.parse(cachedData));
   }
 }
-
-function renderTicker(newsItems) {
-  const tickerElement = document.getElementById("ticker-content");
-  if (!newsItems || newsItems.length === 0) return;
-
-  const formattedText = newsItems.map(item => {
-    return `<span class="highlight">【${item.category}】</span>${item.message}`;
-  }).join('  ///  ');
-
-  tickerElement.innerHTML = formattedText;
-}
-
 function createRowHtml(bus, showStopName = false) {
   const config = ROUTE_CONFIG[bus.routeId];
   const rawStopName = STOP_NAME_MAP[bus.targetStopId] || bus.targetStopId;
