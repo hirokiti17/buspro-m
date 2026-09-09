@@ -28,10 +28,9 @@ jobs:
           WORKER_URL: ${{ secrets.WORKER_URL }}
           GAS_URL: ${{ secrets.GAS_URL }}
         run: |
-          sed -i "s|YOUR_SERVER_URL|${WORKER_URL}|g" index.html
-          sed -i "s|YOUR_GAS_URL|${GAS_URL}|g" index.html
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+          # HTML側の __WORKER_URL__ と __GAS_URL__ に合わせて変更
+          sed -i "s|__WORKER_URL__|${WORKER_URL}|g" index.html
+          sed -i "s|__GAS_URL__|${GAS_URL}|g" index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
