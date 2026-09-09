@@ -46,18 +46,14 @@
 このスプレッドシートにApp Scriptを追加し、作られたコード.js内に、Mainブランチ内のコード.gsの中身を貼り付けてください。
 
 ## デプロイ・開発手順
- ### 独自環境で実行する場合
-* html内のYOUR_SERVER_URLを交通データを取得しているサーバーのURLに変更してください
-* html内のYOUR_GAS_URLを、Google Apps Script のウェブアプリURLに変更してください。
- 
- ### GitHub Pagesで実行する場合
+ ### GitHub Pagesで実行
  1. **GitHub Secrets の設定**
-   リポジトリの `Settings > Secrets and variables > Actions` に以下を登録します。
-   * `WORKER_URL`: Cloudflare Worker のエンドポイントURL
-   * `GAS_URL`: Google Apps Script のウェブアプリURL (`https://script.google.com/macros/s/.../exec`)
+   リポジトリの `Settings > Environments > github-pages > Environment secrets` に以下を登録します。
+   * `__WORKER_URL__`: Cloudflare Worker のエンドポイントURL
+   * `__GAS_URL__`: Google Apps Script のウェブアプリURL (`https://script.google.com/macros/s/.../exec`)
  2. **自動デプロイ**
    `main` ブランチにコードを Push すると、GitHub Actions が HTML 内のプレースホルダーを置換し、GitHub Pages へ自動デプロイされます。
-
+ ### GitHub Pages以外での構築にはまだ対応しておりません。アップデートをお待ちください。
 ---
 
 ## ライセンス・クレジット
