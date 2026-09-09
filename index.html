@@ -201,7 +201,7 @@ td.current-stop { color: #d1dbe5; }
 td.eta { color: var(--led-green); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-size: 1.2rem; }
 td.delay { color: var(--led-red); font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', sans-serif; font-weight: 900; }
 
-/* 文字のみの点滅アニメーション（視認性の高いアンバー・ゴールド色） */
+/* 文字のみの点滅アニメーション */
 @keyframes blinkTextAnimation {
   0%, 100% {
     opacity: 1;
@@ -391,7 +391,7 @@ tbody:empty::after {
 
 .ticker-text span.highlight {
   color: #ffd54f;
-  margin-right: 8px;
+  margin-right: 4px;
 }
 
 @keyframes ticker-animation {
@@ -482,7 +482,7 @@ tbody:empty::after {
 
     <!-- 掲示板枠内・最下部お知らせテロップ -->
     <div class="ticker-container">
-      <div class="ticker-text">
+      <div class="ticker-text" id="ticker-content">
         <span class="highlight">【お知らせ】</span>バスの接近情報は約30秒ごとに自動更新されます。道路状況により実際の到着時間と異なる場合がありますのでご注意ください。
       </div>
     </div>
@@ -529,6 +529,14 @@ tbody:empty::after {
 </div>
 
 <script>
+// --- 環境変数設定エリア ---
+const CONFIG = {
+  // Server API URL
+  WORKER_URL: "YOUR_SERVER_URL",
+  // Google Apps Script (GAS) デプロイ済 Web アプリ URL
+  GAS_URL: "YOUR_GAS_URL"
+};
+
 const ROUTE_CONFIG = {
   "401007": { name: "新都11", cssClass: "shinto11", destinations: { 0: "大宮駅西口", 1: "さいたま新都心駅西口" } },
   "406002": { name: "大31", cssClass: "r-406002", destinations: { 0: "大宮駅西口", 1: "指扇駅" } },
@@ -558,6 +566,53 @@ function handleOverlayClick(event) {
   if (event.target.id === "infoModal") {
     toggleModal(false);
   }
+}
+
+// --- お知らせデータ（GAS）読み込み処理 ---
+async function loadNews() {
+  // 未設定の場合はデフォルトメッセージを表示
+  if (!CONFIG.GAS_URL || CONFIG.GAS_URL.includes("YOUR_GAS_DEPLOYMENT_ID")) {
+    return;
+  }
+
+  const cacheKey = "bus_news_cache";
+  const cacheTimeKey = "bus_news_time";
+  const now = Date.now();
+  const TEN_MINUTES = 10 * 60 * 1000;
+
+  const cachedData = localStorage.getItem(cacheKey);
+  const lastFetch = localStorage.getItem(cacheTimeKey);
+
+  // 10分以内のキャッシュがあればそれを使用
+  if (cachedData && lastFetch && (now - lastFetch < TEN_MINUTES)) {
+    renderTicker(JSON.parse(cachedData));
+    return;
+  }
+
+  try {
+    const res = await fetch(CONFIG.GAS_URL);
+    const data = await res.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheTimeKey, now);
+      renderTicker(data);
+    }
+  } catch (error) {
+    console.error("お知らせの取得に失敗しました:", error);
+    if (cachedData) renderTicker(JSON.parse(cachedData));
+  }
+}
+
+function renderTicker(newsItems) {
+  const tickerElement = document.getElementById("ticker-content");
+  if (!newsItems || newsItems.length === 0) return;
+
+  const formattedText = newsItems.map(item => {
+    return `<span class="highlight">【${item.category}】</span>${item.message}`;
+  }).join('  ///  ');
+
+  tickerElement.innerHTML = formattedText;
 }
 
 function createRowHtml(bus, showStopName = false) {
@@ -624,63 +679,68 @@ function filterAndRender() {
 }
 
 async function load(){
-    const res = await fetch("https://buspro-worker.mingsihongwu809.workers.dev/shinto11");
-    const data = await res.json();
+    try {
+      const res = await fetch(CONFIG.WORKER_URL);
+      const data = await res.json();
 
-    const tripMap = {};
-    data.trips.forEach(t => {
-        if(t.tripUpdate) tripMap[t.tripUpdate.trip.tripId] = t.tripUpdate;
-    });
+      const tripMap = {};
+      data.trips.forEach(t => {
+          if(t.tripUpdate) tripMap[t.tripUpdate.trip.tripId] = t.tripUpdate;
+      });
 
-    const allBuses = [];
+      const allBuses = [];
 
-    data.vehicles.forEach(v => {
-        if(!v.vehicle) return;
-        const vehicle = v.vehicle;
-        const trip = tripMap[vehicle.trip.tripId];
-        if(!trip) return;
+      data.vehicles.forEach(v => {
+          if(!v.vehicle) return;
+          const vehicle = v.vehicle;
+          const trip = tripMap[vehicle.trip.tripId];
+          if(!trip) return;
 
-        const routeId = vehicle.trip.routeId;
-        if(!ROUTE_CONFIG[routeId]) return;
+          const routeId = vehicle.trip.routeId;
+          if(!ROUTE_CONFIG[routeId]) return;
 
-        trip.stopTimeUpdate.forEach(s => {
-            let matchedStopId = null;
-            if(s.stopId.startsWith("120034")) matchedStopId = "120034";
-            if(s.stopId.startsWith("120101")) matchedStopId = "120101";
+          trip.stopTimeUpdate.forEach(s => {
+              let matchedStopId = null;
+              if(s.stopId.startsWith("120034")) matchedStopId = "120034";
+              if(s.stopId.startsWith("120101")) matchedStopId = "120101";
 
-            if(matchedStopId) {
-                const arrival = Number(s.arrival.time) * 1000;
-                const scheduledEtaMin = Math.round((arrival - Date.now()) / 60000);
-                const delay = Math.round((s.arrival.delay || 0) / 60);
+              if(matchedStopId) {
+                  const arrival = Number(s.arrival.time) * 1000;
+                  const scheduledEtaMin = Math.round((arrival - Date.now()) / 60000);
+                  const delay = Math.round((s.arrival.delay || 0) / 60);
 
-                const totalEtaMin = scheduledEtaMin + delay;
+                  const totalEtaMin = scheduledEtaMin + delay;
 
-                if(totalEtaMin >= 0) {
-                    const config = ROUTE_CONFIG[routeId];
-                    const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
-                        ? config.destinations[vehicle.trip.directionId]
-                        : "行き先不明";
+                  if(totalEtaMin >= 0) {
+                      const config = ROUTE_CONFIG[routeId];
+                      const destName = (config.destinations && config.destinations[vehicle.trip.directionId])
+                          ? config.destinations[vehicle.trip.directionId]
+                          : "行き先不明";
 
-                    allBuses.push({
-                        targetStopId: matchedStopId,
-                        routeId: routeId,
-                        vehicleLabel: vehicle.vehicle.label,
-                        destination: destName,
-                        currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
-                        totalEtaMin: totalEtaMin,
-                        delay: delay
-                    });
-                }
-            }
-        });
-    });
+                      allBuses.push({
+                          targetStopId: matchedStopId,
+                          routeId: routeId,
+                          vehicleLabel: vehicle.vehicle.label,
+                          destination: destName,
+                          currentStop: data.stopNameMap[vehicle.stopId] || vehicle.stopId || "走行中",
+                          totalEtaMin: totalEtaMin,
+                          delay: delay
+                      });
+                  }
+              }
+          });
+      });
 
-    allBuses.sort((a, b) => a.totalEtaMin - b.totalEtaMin);
+      allBuses.sort((a, b) => a.totalEtaMin - b.totalEtaMin);
 
-    cachedBusData = allBuses;
-    filterAndRender();
+      cachedBusData = allBuses;
+      filterAndRender();
 
-    document.getElementById("status").textContent = "更新 " + new Date().toLocaleTimeString();
+      document.getElementById("status").textContent = "更新 " + new Date().toLocaleTimeString();
+    } catch(err) {
+      console.error("バスデータの取得に失敗しました:", err);
+      document.getElementById("status").textContent = "通信エラー";
+    }
 }
 
 let timerId = null;
@@ -703,11 +763,14 @@ document.addEventListener("visibilitychange", () => {
     stopPolling();
   } else {
     load();
+    loadNews();
     startPolling();
   }
 });
 
+// 初回読み込みを実行
 load();
+loadNews();
 startPolling();
 </script>
 
