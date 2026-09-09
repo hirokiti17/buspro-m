@@ -13313,12 +13313,23 @@ var index_default = {
         headers: { "Content-Type": "application/json" }
       });
     }
+
+    // --- キャッシュ処理の追加 ---
+    const cache = caches.default;
+    const cacheKey = new Request(url.toString(), request);
+    let response = await cache.match(cacheKey);
+
+    // キャッシュが存在する場合はデコード処理を行わずに即返却 (CPU時間 ほぼ0ms)
+    if (response) {
+      return response;
+    }
+
     try {
       const vehicleRes = await fetch(
-        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_vehicle?acl:consumerKey=YOUR_API_KEY`
+        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_vehicle?acl:consumerKey=vbexkf3r92gxedqv81bnlr4ogta82oqu3ps60f35c5fww7aixzwilr6b2889c3qz`
       );
       const tripRes = await fetch(
-        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_trip_update?acl:consumerKey=YOUR_API_KEY`
+        `https://api.odpt.org/api/v4/gtfs/realtime/SeibuBus_trip_update?acl:consumerKey=vbexkf3r92gxedqv81bnlr4ogta82oqu3ps60f35c5fww7aixzwilr6b2889c3qz`
       );
       if (!vehicleRes.ok || !tripRes.ok) {
         throw new Error("\u897F\u6B66\u30D0\u30B9API\u304B\u3089\u306E\u30C7\u30FC\u30BF\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F");
@@ -13336,13 +13347,21 @@ var index_default = {
         trips: tripFeed.entity,
         stopNameMap
       };
-      return new Response(JSON.stringify(resultData), {
+
+      // 15秒間キャッシュするヘッダーを設定
+      response = new Response(JSON.stringify(resultData), {
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Access-Control-Allow-Origin": "*"
-          // どこからのHTMLアクセスも許可
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "public, max-age=15"
         }
       });
+
+      // バックグラウンドでキャッシュに保存
+      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+
+      return response;
+
     } catch (err) {
       return new Response(JSON.stringify({ error: err.message }), {
         status: 500,
@@ -13354,6 +13373,7 @@ var index_default = {
     }
   }
 };
+
 export {
   index_default as default
 };
